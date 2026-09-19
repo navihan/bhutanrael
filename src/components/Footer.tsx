@@ -29,8 +29,9 @@ export const Footer: React.FC = () => {
                 </svg>
               </div>
               <div>
-                <div className="text-base font-bold text-white font-display">
-                  {language === 'ko' ? '부탄 라엘리안 무브먼트' : 'Bhutan Raëlian Movement'}
+                <div className="text-base font-bold text-white font-display flex items-center gap-2">
+                  <span>{language === 'ko' ? '부탄 라엘리안 무브먼트' : 'Bhutan Raëlian Movement'}</span>
+                  <span className="text-xs font-normal text-[#A69584] font-dzongkha">འབྲུག་ཡུལ།</span>
                 </div>
                 <div className="text-[10px] text-[#A69584] uppercase tracking-wider">
                   INTERNATIONAL RAËLIAN MOVEMENT

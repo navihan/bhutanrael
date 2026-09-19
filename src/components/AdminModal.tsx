@@ -61,7 +61,8 @@ export const AdminModal: React.FC = () => {
     resetToDefault,
     exportData,
     importData,
-    language
+    language,
+    navigate
   } = useSite();
 
   const [newPasswordInput, setNewPasswordInput] = useState('');
@@ -254,6 +255,39 @@ export const AdminModal: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Quick Navigation to Site Sections */}
+            <div className="hidden lg:flex items-center gap-1 border-r border-white/10 pr-2 mr-1">
+              <span className="text-[11px] text-[#A69584] font-medium mr-1 flex items-center gap-1">
+                <ExternalLink className="w-3 h-3 text-[#A69584]" />
+                <span>{language === 'ko' ? '사이트 바로가기:' : 'Jump to:'}</span>
+              </span>
+              {[
+                { id: '#about', label: language === 'ko' ? '소개' : 'About' },
+                { id: '#philosophy', label: language === 'ko' ? '철학' : 'Philosophy' },
+                { id: '#embassy', label: language === 'ko' ? '대사관' : 'Embassy' },
+                { id: '#articles', label: language === 'ko' ? '소식' : 'News' },
+                { id: '#books', label: language === 'ko' ? '도서' : 'Books' },
+                { id: '#events', label: language === 'ko' ? '일정' : 'Events' },
+                { id: '#contact', label: language === 'ko' ? '연락처' : 'Contact' },
+              ].map((sec) => (
+                <button
+                  key={sec.id}
+                  type="button"
+                  onClick={() => {
+                    setIsAdminOpen(false);
+                    navigate('/');
+                    setTimeout(() => {
+                      const el = document.querySelector(sec.id);
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }, 120);
+                  }}
+                  className="px-2 py-1 rounded-md text-[11px] font-medium text-[#C8B8A6] hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                >
+                  {sec.label}
+                </button>
+              ))}
+            </div>
+
             {saveSuccessMsg && (
               <span className="text-xs bg-emerald-500/20 text-emerald-300 px-3 py-1 rounded-full border border-emerald-500/40 animate-pulse">
                 {saveSuccessMsg}
@@ -1198,9 +1232,9 @@ export const AdminModal: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { key: 'editorial', name: '에디토리얼 럭셔리 (Cinzel + Noto)', desc: '고급스럽고 장엄한 영적 분위기' },
-                    { key: 'sans', name: '모던 산세리프 (Plus Jakarta)', desc: '현대적이고 직관적인 가독성' },
-                    { key: 'cinzel', name: '클래식 로열 (Cinzel Classic)', desc: '웅장하고 고풍스러운 서체' }
+                    { key: 'editorial', name: '소프트 모던 (Outfit + Noto)', desc: '부드러운 곡선과 세련된 영문/부탄어 조화' },
+                    { key: 'sans', name: '클린 산세리프 (Plus Jakarta)', desc: '현대적이고 높은 가독성의 부드러운 서체' },
+                    { key: 'cinzel', name: '클래식 엘레강스 (Cormorant)', desc: '우아하고 섬세한 프리미엄 서체' }
                   ].map(f => (
                     <button
                       key={f.key}
@@ -1551,7 +1585,7 @@ export const AdminModal: React.FC = () => {
                       {language === 'ko' ? '로그인 접속 경로' : 'Admin Login URL'}
                     </span>
                     <div className="font-mono text-[#EA580C] font-bold text-xs pt-0.5">
-                      /admin/login (또는 #/admin/login)
+                      /admin0/login (또는 #/admin0/login)
                     </div>
                     <p className="text-[11px] text-[#8C7A68]">
                       {language === 'ko' 

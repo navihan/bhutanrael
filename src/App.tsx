@@ -26,8 +26,8 @@ const MainLayout: React.FC = () => {
     language 
   } = useSite();
 
-  // If path is admin/login, render dedicated admin portal login page
-  if (currentPath === 'admin/login') {
+  // If path is admin0/login, render dedicated admin portal login page
+  if (currentPath === 'admin0/login') {
     return (
       <>
         <AdminLoginPage />

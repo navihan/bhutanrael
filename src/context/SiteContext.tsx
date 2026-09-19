@@ -197,8 +197,8 @@ const getInitialPath = (): string => {
   if (typeof window === 'undefined') return '/';
   const hash = window.location.hash.replace(/^#\/?/, '');
   const path = window.location.pathname.replace(/^\/+/, '');
-  if (hash.startsWith('admin/login') || path.startsWith('admin/login')) {
-    return 'admin/login';
+  if (hash.startsWith('admin0/login') || path.startsWith('admin0/login')) {
+    return 'admin0/login';
   }
   return '/';
 };
@@ -413,9 +413,9 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const navigate = (path: string) => {
     const cleanPath = path.replace(/^\/+/, '');
-    if (cleanPath === 'admin/login') {
-      window.location.hash = '/admin/login';
-      setCurrentPath('admin/login');
+    if (cleanPath === 'admin0/login') {
+      window.location.hash = '/admin0/login';
+      setCurrentPath('admin0/login');
     } else {
       window.location.hash = '';
       setCurrentPath('/');
@@ -426,7 +426,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Secure setter for Admin Modal - prevents unauthorized access
   const setIsAdminOpen = (open: boolean) => {
     if (open && !isAdminAuthenticated) {
-      navigate('admin/login');
+      navigate('admin0/login');
       return;
     }
     setIsAdminOpenState(open);
@@ -766,13 +766,14 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     document.documentElement.style.setProperty('--site-accent', theme.accentColor);
     document.body.style.backgroundColor = theme.bgColor;
 
-    // Font family style
+    // Font family style with smooth curves and universal fallbacks
+    const universalFallbacks = "'Noto Sans KR', 'Noto Sans Tibetan', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
     if (theme.fontFamily === 'editorial') {
-      document.body.style.fontFamily = "'Noto Sans KR', 'Plus Jakarta Sans', sans-serif";
+      document.body.style.fontFamily = `'Outfit', ${universalFallbacks}`;
     } else if (theme.fontFamily === 'cinzel') {
-      document.body.style.fontFamily = "'Cinzel', 'Noto Sans KR', serif";
+      document.body.style.fontFamily = `'Cormorant Garamond', 'Noto Serif Tibetan', ${universalFallbacks}`;
     } else {
-      document.body.style.fontFamily = "'Plus Jakarta Sans', 'Noto Sans KR', sans-serif";
+      document.body.style.fontFamily = `'Plus Jakarta Sans', ${universalFallbacks}`;
     }
   }, [theme]);
 

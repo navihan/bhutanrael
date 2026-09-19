@@ -1,5 +1,5 @@
 import React, { useState, useRef, DragEvent, ChangeEvent } from 'react';
-import { UploadCloud, Image as ImageIcon, Check, RefreshCw, Trash2, Link as LinkIcon, FileImage, Sparkles } from 'lucide-react';
+import { UploadCloud, Check, RefreshCw, Trash2, FileImage } from 'lucide-react';
 
 interface ImageUploaderProps {
   id?: string;
@@ -90,8 +90,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [metaInfo, setMetaInfo] = useState<{ width?: number; height?: number; size?: number; name?: string } | null>(null);
-  const [showUrlFallback, setShowUrlFallback] = useState(false);
-  const [customUrlInput, setCustomUrlInput] = useState(value);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isUploadedDataUrl = value && value.startsWith('data:image/');
@@ -108,7 +106,6 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     try {
       const result = await processAndOptimizeImage(file);
       onChange(result.dataUrl);
-      setCustomUrlInput(result.dataUrl);
       setMetaInfo({
         width: result.width,
         height: result.height,
@@ -147,19 +144,10 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const handleRemove = () => {
     if (defaultValue) {
       onChange(defaultValue);
-      setCustomUrlInput(defaultValue);
     } else {
       onChange('');
-      setCustomUrlInput('');
     }
     setMetaInfo(null);
-  };
-
-  const handleUrlApply = () => {
-    if (customUrlInput.trim()) {
-      onChange(customUrlInput.trim());
-      setMetaInfo(null);
-    }
   };
 
   const aspectClass = 
@@ -180,14 +168,9 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
               {recommendedSize}
             </span>
           )}
-          <button
-            type="button"
-            onClick={() => setShowUrlFallback(!showUrlFallback)}
-            className="text-[11px] text-[#A66E38] hover:text-[#EA580C] underline cursor-pointer flex items-center gap-1"
-          >
-            <LinkIcon className="w-3 h-3" />
-            <span>{showUrlFallback ? (language === 'ko' ? '업로드 모드로' : 'Upload Mode') : (language === 'ko' ? 'URL 링크 입력' : 'URL Link')}</span>
-          </button>
+          <span className="text-[11px] font-semibold text-[#EA580C] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">
+            {language === 'ko' ? '파일 직접 업로드' : 'Direct File Upload'}
+          </span>
         </div>
       </div>
 
@@ -235,8 +218,8 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                 <Check className="w-3 h-3 text-emerald-400" />
                 <span>
                   {isUploadedDataUrl
-                    ? (language === 'ko' ? '사용자 직접 업로드 파일' : 'Uploaded Image')
-                    : (language === 'ko' ? '기본/웹 이미지' : 'Standard Web Image')}
+                    ? (language === 'ko' ? '기기에서 업로드된 이미지' : 'Uploaded Device Image')
+                    : (language === 'ko' ? '등록된 이미지' : 'Current Image')}
                 </span>
                 {metaInfo?.size && (
                   <span className="text-stone-300 ml-1">
@@ -253,7 +236,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
                   className="px-3.5 py-2 rounded-lg bg-white/95 text-[#1E1915] text-xs font-bold shadow-md hover:bg-white flex items-center gap-1.5 transition-transform hover:scale-105 cursor-pointer"
                 >
                   <UploadCloud className="w-4 h-4 text-[#EA580C]" />
-                  <span>{language === 'ko' ? '새 이미지로 교체' : 'Replace Image'}</span>
+                  <span>{language === 'ko' ? '새 이미지 파일로 교체' : 'Replace Image File'}</span>
                 </button>
 
                 {defaultValue && value !== defaultValue && (
@@ -281,18 +264,19 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
 
             {/* Bottom mini bar with quick actions */}
             <div className="mt-2 pt-1 flex items-center justify-between px-1 text-xs">
-              <span className="text-[11px] text-[#6E5D4C] truncate max-w-xs">
-                {metaInfo?.name || (isUploadedDataUrl ? (language === 'ko' ? '로컬 최적화 이미지' : 'Local optimized image') : value.slice(0, 45) + '...')}
+              <span className="text-[11px] text-[#6E5D4C] truncate max-w-xs flex items-center gap-1">
+                <FileImage className="w-3.5 h-3.5 text-[#EA580C] shrink-0" />
+                <span className="truncate">{metaInfo?.name || (isUploadedDataUrl ? (language === 'ko' ? '업로드된 이미지 파일' : 'Uploaded file') : (language === 'ko' ? '기본 이미지' : 'Standard image'))}</span>
               </span>
 
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-1 text-xs font-semibold text-[#EA580C] hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FAF5EE] border border-[#E0D4C5] text-xs font-semibold text-[#EA580C] hover:bg-[#F2ECE2] cursor-pointer transition-colors"
                 >
                   <UploadCloud className="w-3.5 h-3.5" />
-                  <span>{language === 'ko' ? '다른 파일 선택' : 'Upload Another'}</span>
+                  <span>{language === 'ko' ? '기기에서 파일 선택' : 'Choose File'}</span>
                 </button>
 
                 {defaultValue && value !== defaultValue && (
@@ -313,59 +297,36 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
             onClick={() => fileInputRef.current?.click()}
             className="p-8 flex flex-col items-center justify-center text-center cursor-pointer group"
           >
-            <div className="w-12 h-12 rounded-full bg-[#EAE0D3] group-hover:bg-[#E2D5C3] group-hover:scale-110 flex items-center justify-center text-[#EA580C] transition-all mb-3 shadow-2xs">
+            <div className="w-14 h-14 rounded-2xl bg-[#EAE0D3] group-hover:bg-[#E2D5C3] group-hover:scale-105 flex items-center justify-center text-[#EA580C] transition-all mb-3 shadow-2xs">
               {isProcessing ? (
-                <RefreshCw className="w-6 h-6 animate-spin text-[#EA580C]" />
+                <RefreshCw className="w-7 h-7 animate-spin text-[#EA580C]" />
               ) : (
-                <UploadCloud className="w-6 h-6" />
+                <UploadCloud className="w-7 h-7" />
               )}
             </div>
 
             <p className="text-xs sm:text-sm font-bold text-[#2A231C]">
-              {language === 'ko' ? '클릭하여 이미지 파일 선택 또는 여기에 드래그' : 'Click to select image or drag & drop here'}
+              {language === 'ko' ? '여기를 클릭하여 기기에서 이미지 파일 선택' : 'Click to select image file from device'}
             </p>
             <p className="text-[11px] text-[#7A6B5B] mt-1">
-              JPG, PNG, WEBP, GIF, SVG (최대 10MB 자동 최적화)
+              {language === 'ko' ? '또는 이미지 파일을 이 영역으로 직접 드래그하세요' : 'or drag and drop image file here'}
             </p>
+            <div className="mt-3 flex items-center gap-1.5 text-[10px] text-[#8C7A68] bg-white/70 px-2.5 py-1 rounded-md border border-[#E0D5C7]">
+              <span>JPG • PNG • WEBP • GIF • SVG (자동 최적화)</span>
+            </div>
           </div>
         )}
 
         {/* Loading overlay when processing canvas */}
         {isProcessing && (
-          <div className="absolute inset-0 bg-white/80 backdrop-blur-xs flex flex-col items-center justify-center z-10">
-            <RefreshCw className="w-7 h-7 text-[#EA580C] animate-spin mb-2" />
+          <div className="absolute inset-0 bg-white/85 backdrop-blur-xs flex flex-col items-center justify-center z-10">
+            <RefreshCw className="w-8 h-8 text-[#EA580C] animate-spin mb-2" />
             <span className="text-xs font-bold text-[#1E1915]">
               {language === 'ko' ? '이미지 최적화 처리 중...' : 'Optimizing image...'}
             </span>
           </div>
         )}
       </div>
-
-      {/* Secondary URL Input (if user toggled it) */}
-      {showUrlFallback && (
-        <div className="p-3 bg-white rounded-xl border border-[#DDD0C0] space-y-2 animate-in fade-in duration-200">
-          <div className="text-[11px] font-bold text-[#55473A] flex items-center gap-1.5">
-            <LinkIcon className="w-3.5 h-3.5 text-[#EA580C]" />
-            <span>{language === 'ko' ? '웹 이미지 URL 링크로 직접 적용' : 'Apply External Web Image URL'}</span>
-          </div>
-          <div className="flex gap-2">
-            <input
-              type="url"
-              value={customUrlInput}
-              onChange={(e) => setCustomUrlInput(e.target.value)}
-              placeholder="https://images.unsplash.com/..."
-              className="flex-1 px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#EA580C]"
-            />
-            <button
-              type="button"
-              onClick={handleUrlApply}
-              className="px-3 py-1.5 rounded-lg bg-[#2E251E] hover:bg-[#43372C] text-white text-xs font-semibold cursor-pointer whitespace-nowrap"
-            >
-              {language === 'ko' ? 'URL 적용' : 'Apply URL'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

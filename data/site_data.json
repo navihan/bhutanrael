@@ -1,0 +1,462 @@
+{
+  "theme": {
+    "bgColor": "#FAF7F2",
+    "accentColor": "#EA580C",
+    "showAnnouncement": true,
+    "announcementText": {
+      "ko": "✨ 2026 부탄 팀푸 엘로힘 평화 명상 워크숍 참가 신청 접수 중입니다.",
+      "en": "✨ Registration is now open for the 2026 Bhutan Thimphu Elohim Peace Meditation Workshop."
+    },
+    "announcementLink": "#events"
+  },
+  "seo": {
+    "metaTitle": {
+      "ko": "부탄 라엘리안 무브먼트 | Bhutan Raëlian Movement",
+      "en": "Bhutan Raëlian Movement | Official Portal"
+    },
+    "metaDescription": {
+      "ko": "부탄 라엘리안 무브먼트 공식 웹사이트. 우주인 엘로힘의 메시지, 지적설계 철학, 외계인 대사관 프로젝트 및 팀푸 세미나 안내.",
+      "en": "Official Bhutan Raëlian Movement website. Messages from the Elohim, Intelligent Design, Extraterrestrial Embassy project and seminars in Bhutan."
+    },
+    "keywords": "부탄 라엘리안, Bhutan Raelian, 엘로힘, Elohim, 지적설계, Intelligent Design, 외계인 대사관, Embassy project, 라엘, Rael, 감각명상, Sensual Meditation, 팀푸, Thimphu",
+    "ogImageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80",
+    "canonicalUrl": "https://bhutanrm.org",
+    "siteName": "Bhutan Raëlian Movement",
+    "socialLinks": {
+      "facebook": "https://www.facebook.com/BhutanRaelianMovement",
+      "youtube": "https://www.youtube.com/@RaelianMovement",
+      "twitter": "https://x.com/raelianofficial",
+      "instagram": "https://instagram.com/raelianmovement",
+      "telegram": "https://t.me/raelianmovement",
+      "email": "navihan01@gmail.com"
+    }
+  },
+  "content": {
+    "hero": {
+      "badge": {
+        "ko": "부탄 라엘리안 무브먼트 공식 웹사이트",
+        "en": "Official Portal of Bhutan Raëlian Movement"
+      },
+      "title": {
+        "ko": "인류의 창조자 엘로힘을 맞이하는 평화의 땅, 부탄",
+        "en": "Welcoming Our Creators, The Elohim, in the Serene Land of Bhutan"
+      },
+      "subtitle": {
+        "ko": "과학적 지적설계, 감각명상을 통한 내면의 각성, 그리고 지구상에 평화로운 미래를 열어갈 외계인 대사관 프로젝트에 동참하세요.",
+        "en": "Join the journey of scientific intelligent design, awakening through sensual meditation, and the historic Extraterrestrial Embassy project."
+      },
+      "primaryCtaText": {
+        "ko": "엘로힘 메시지 읽기",
+        "en": "Read Elohim Message"
+      },
+      "primaryCtaLink": "#philosophy",
+      "secondaryCtaText": {
+        "ko": "도서 무료 다운로드",
+        "en": "Download Free eBooks"
+      },
+      "secondaryCtaLink": "#books",
+      "heroImage": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1600&auto=format&fit=crop&q=80"
+    },
+    "about": {
+      "title": {
+        "ko": "인류의 기원과 라엘리안 무브먼트",
+        "en": "Origins of Humanity & The Raëlian Movement"
+      },
+      "subtitle": {
+        "ko": "우주는 영원하며, 생명은 우연이 아닌 고도의 과학기술에 의해 설계되었습니다",
+        "en": "The universe is eternal, and life was scientifically created through advanced genetics."
+      },
+      "description": {
+        "ko": "1973년 12월, 프랑스의 저널리스트 라엘(Raël)은 지구상의 모든 생명체를 DNA 합성 기술로 창조한 우주인 \"엘로힘(Elohim)\"과 조우하여 전 인류에게 전할 메시지를 받았습니다. 엘로힘은 히브리어 원어로 \"하늘에서 온 사람들\"을 의미하며, 고대 경전에서 신(God)으로 잘못 번역되었습니다. 부탄 라엘리안 무브먼트는 평화와 자연을 숭상하는 부탄의 정신과 함께, 엘로힘의 메시지를 널리 알리고 대사관을 준비하는 비영리 평화 운동 단체입니다.",
+        "en": "In December 1973, French journalist Raël encountered representatives of an advanced extraterrestrial civilization known as the Elohim—meaning \"those who came from the sky\" in ancient Hebrew. They revealed that all life on Earth was created scientifically using DNA synthesis and advanced genetic engineering. The Bhutan Raëlian Movement works peacefully alongside Bhutan’s rich values of harmony and Gross National Happiness to share this transformative truth."
+      },
+      "quote": {
+        "ko": "사랑은 모든 것의 해답이며, 과학은 진실을 보는 눈입니다.",
+        "en": "Love is the answer to everything, and science is the eye to see truth."
+      },
+      "quoteAuthor": {
+        "ko": "마이트레야 라엘 (Maitreya Raël)",
+        "en": "Maitreya Raël"
+      },
+      "aboutImage": "https://images.unsplash.com/photo-1544717305-2782549b5136?w=900&auto=format&fit=crop&q=80"
+    },
+    "embassy": {
+      "title": {
+        "ko": "외계인 대사관 프로젝트",
+        "en": "The Extraterrestrial Embassy Project"
+      },
+      "subtitle": {
+        "ko": "창조자 엘로힘의 공식 귀환을 영접하기 위한 지구상 최초의 외교 공관",
+        "en": "The First Official Diplomatic Compound on Earth to Welcome Our Creators"
+      },
+      "description": {
+        "ko": "엘로힘은 인류가 스스로 그들을 맞이할 준비가 되었을 때만 공식적으로 지구에 귀환하겠다고 약속했습니다. 이를 위해 국제법상 치외법권과 비행 제한 구역이 보장되는 중립적 대사관 부지가 필요합니다. 부탄의 순수한 자연환경과 평화 애호 정책(Gross National Happiness)은 엘로힘 대사관 후보지로서 상징적인 조화를 이룹니다.",
+        "en": "The Elohim will only return when humanity proves ready to welcome them in peace and love. A designated extraterrestrial embassy with extraterritorial diplomatic status and secure neutral airspace is required. Bhutan, with its peaceful coexistence and commitment to national happiness, holds a deeply inspiring resonance with this cosmic mission."
+      },
+      "highlightPoints": {
+        "ko": [
+          "국제법상 치외법권 지위 보장 및 대사관 부지 약 4km² 구상",
+          "비행 제한 공역과 외교적 중립성을 갖춘 평화 협정 체결",
+          "엘로힘과의 공식 교류를 통한 첨단 청정에너지 및 의료 기술 전수 기회",
+          "세계적인 평화 순례지와 인류 화합의 상징적 랜드마크 조성"
+        ],
+        "en": [
+          "Extraterritorial diplomatic status spanning approx. 4 km² safe zone",
+          "Neutral airspace agreement guaranteeing peaceful and safe arrival",
+          "Unprecedented transfer of advanced ecological, scientific and health technologies",
+          "A global landmark for world peace, unity, and cosmic brotherhood"
+        ]
+      },
+      "embassyImage": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80"
+    },
+    "contact": {
+      "address": {
+        "ko": "부탄 팀푸 노르진 람 (Norzin Lam, Thimphu, Kingdom of Bhutan)",
+        "en": "Norzin Lam, Thimphu, Kingdom of Bhutan"
+      },
+      "phone": "+975 2 321 000 / +82 10 0000 0000",
+      "email": "navihan01@gmail.com",
+      "meetingHours": {
+        "ko": "토요일 & 일요일: 오후 2시 ~ 5시 (사전 예약 권장)",
+        "en": "Saturday & Sunday: 2:00 PM – 5:00 PM (RSVP recommended)"
+      }
+    }
+  },
+  "philosophyPillars": [
+    {
+      "id": "design",
+      "icon": "dna",
+      "title": {
+        "ko": "과학적 지적설계 (Intelligent Design)",
+        "en": "Scientific Intelligent Design"
+      },
+      "tagline": {
+        "ko": "생명은 우연이 아닌 고도화된 DNA 유전공학의 결정체",
+        "en": "Life is the deliberate synthesis of sophisticated DNA genetics"
+      },
+      "points": {
+        "ko": [
+          "지구상의 모든 생물체는 수만 년 앞선 엘로힘 과학자들에 의해 창조되었습니다.",
+          "고대 종교 경전 속 \"신(Elohim)\"은 신비주의적 존재가 아니라 하늘에서 온 실제 과학자들입니다.",
+          "오늘날 인류의 합성 생물학 및 유전자 가위 기술이 이 진실을 과학적으로 입증하고 있습니다.",
+          "진화론의 잃어버린 고리와 생화학적 복잡성을 합리적으로 설명합니다."
+        ],
+        "en": [
+          "All terrestrial organisms were scientifically synthesized by Elohim scientists in laboratories.",
+          "Ancient scripture references to \"Gods\" (Elohim) describe actual space travelers with advanced tech.",
+          "Current advances in synthetic biology and CRISPR validate the feasibility of artificial life creation.",
+          "Provides logical answers to irreducibly complex biological mechanisms."
+        ]
+      },
+      "image": "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "embassy",
+      "icon": "building-2",
+      "title": {
+        "ko": "외계인 대사관 (Extraterrestrial Embassy)",
+        "en": "The Extraterrestrial Embassy"
+      },
+      "tagline": {
+        "ko": "창조자들의 공식 귀환을 영접하기 위한 지구 최초의 공식 외교 공관",
+        "en": "The first diplomatic embassy to welcome our creators back in peace"
+      },
+      "points": {
+        "ko": [
+          "엘로힘은 인류의 자유의지를 침해하지 않으며, 공식 초청과 준비가 완료되었을 때 귀환합니다.",
+          "대사관 부지에는 중립성과 치외법권, 상공 안전 비행권이 보장되어야 합니다.",
+          "대사관 완공 시 인류는 질병 퇴치와 무한 청정에너지 등 비약적 과학기술을 선물받게 됩니다.",
+          "부탄의 평화애호 국가철학은 대사관 유치 비전과 완벽하게 부합합니다."
+        ],
+        "en": [
+          "The Elohim will not impose their presence; they return only upon peaceful official diplomatic invitation.",
+          "Requires extraterritorial neutral sovereignty and guaranteed peaceful airspace.",
+          "Formal contact will inaugurate a new era of clean ecological energy and advanced curative medicine.",
+          "Bhutan’s non-aligned serenity makes it a sublime prospective host country."
+        ]
+      },
+      "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "meditation",
+      "icon": "heart",
+      "title": {
+        "ko": "감각명상과 행복 (Sensual Meditation)",
+        "en": "Sensual Meditation & Pure Happiness"
+      },
+      "tagline": {
+        "ko": "오감의 정화와 뇌신경 세포 활성화를 통한 무조건적 행복 실천",
+        "en": "Awakening five senses to experience unconditional present happiness"
+      },
+      "points": {
+        "ko": [
+          "죄의식과 금욕 대신, 내 몸의 수십조 개 세포와 우주가 연결된 감각을 깨웁니다.",
+          "시각, 청각, 촉각, 미각, 후각의 섬세한 개발을 통해 뇌의 엔도르핀과 세로토닌을 증폭합니다.",
+          "매일 웃음과 자기 긍정으로 세포를 치유하고 타인에게 무조건적인 사랑을 전파합니다.",
+          "부탄의 국민총행복(GNH) 철학과 깊은 내적 공명을 이룹니다."
+        ],
+        "en": [
+          "Transcend guilt and dogmatic asceticism; awaken the trillions of cells communicating with the cosmos.",
+          "Refine sight, sound, touch, taste, and smell to maximize natural dopamine and serotonin.",
+          "Daily smile exercises, self-compassion, and radiating unconditional peace to society.",
+          "Harmonizes effortlessly with Bhutan’s Gross National Happiness ethos."
+        ]
+      },
+      "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "infinity",
+      "icon": "infinity",
+      "title": {
+        "ko": "무한의 철학 (Philosophy of Infinity)",
+        "en": "Cosmic Infinity in Time & Space"
+      },
+      "tagline": {
+        "ko": "시작도 끝도 없는 우주, 거대무한과 극미무한의 프랙탈 연속성",
+        "en": "An eternal universe without beginning or end across infinite scales"
+      },
+      "points": {
+        "ko": [
+          "물질과 우주는 무(Nothing)에서 창조된 것이 아니며 영원 전부터 존재해 왔습니다.",
+          "원자 속의 소립자 안에도 또 다른 거대한 우주가 있고, 우리 우주 또한 상위 거인의 한 원자입니다.",
+          "신비주의적 미신을 배격하고 우주의 영원한 순환과 과학적 사실을 직시합니다.",
+          "영원한 우주 속에서 지구 인류의 과학적 형제애와 책임을 자각합니다."
+        ],
+        "en": [
+          "Matter and energy are eternal; nothing comes from nothingness.",
+          "Infinitely small particles contain whole galaxies; our universe is a subatomic particle in a larger cosmos.",
+          "Dispels superstitious dogma in favor of rational fractal cosmology.",
+          "Instills deep humility and scientific kinship with all cosmic civilizations."
+        ]
+      },
+      "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "inq-sample-1",
+      "name": "Karma Wangchuk",
+      "email": "karma.w@bhutanpeace.org",
+      "phone": "+975 17 123 456",
+      "subject": "팀푸 평화 명상 워크숍 참여 신청 및 대사관 도서 문의",
+      "message": "안녕하세요! 부탄 팀푸에서 열리는 라엘리안 평화 명상 워크숍에 참여하고 싶습니다. 관련하여 '지적설계' 종이책도 함께 받아볼 수 있는지 여쭙습니다. 항상 평화의 메시지에 감사드립니다.",
+      "createdAt": "2026-09-17 14:20",
+      "status": "unread"
+    }
+  ],
+  "posts": [
+    {
+      "id": "post-1",
+      "title": {
+        "ko": "부탄 라엘리안 무브먼트 공식 포털 개설 및 팀푸 평화 모임 안내",
+        "en": "Official Launch of Bhutan Raëlian Movement Portal & Thimphu Peace Gathering"
+      },
+      "summary": {
+        "ko": "부탄 왕국 내 라엘리안 철학 보급과 엘로힘 대사관 비전을 공유하기 위한 공식 온라인 포털이 공식 오픈하였습니다.",
+        "en": "Our official digital portal has launched to share the Elohim message and Embassy vision across the Kingdom of Bhutan."
+      },
+      "content": {
+        "ko": "부탄 라엘리안 무브먼트는 부탄 왕국의 고유한 평화 전통과 국민총행복(GNH) 정신에 깊은 경의를 표하며, 인류의 기원과 평화로운 미래를 제시하는 엘로힘의 메시지를 전파하기 위한 공식 포털을 오픈하였습니다.\n\n### 주요 활동 계획\n1. **정기 감각명상 워크숍**: 팀푸 및 파로 지역에서 매월 2회 평화 명상 및 뇌 활성화 세미나를 진행합니다.\n2. **지적설계 도서 무료 보급**: 인류 창조의 진실을 담은 도서 '지적설계(Intelligent Design)' 무료 디지털 다운로드 및 종이책 증정 행사.\n3. **대사관 프로젝트 설명회**: 유엔 및 부탄 정부에 외계인 대사관 유치의 경제적, 학문적, 평화적 혜택을 알리는 활동.\n\n모든 관심 있는 분들의 자유롭고 따뜻한 참여를 환영합니다.",
+        "en": "The Bhutan Raëlian Movement pays deep respect to the Kingdom of Bhutan's tradition of peace and Gross National Happiness (GNH), and proudly announces the opening of its official portal.\n\n### Core Initiatives\n1. **Sensual Meditation Workshops**: Held bi-weekly in Thimphu and Paro to foster deep mindfulness and brain harmony.\n2. **Free Book Distribution**: Free electronic and printed copies of 'Intelligent Design: Message from the Designers'.\n3. **Embassy Presentation**: Public awareness on the peaceful and technological benefits of hosting the Extraterrestrial Embassy.\n\nWe warmly welcome all free-thinking seekers of peace and scientific understanding."
+      },
+      "category": "announcement",
+      "author": "부탄 지부 운영위원회",
+      "date": "2026-03-10",
+      "readTime": "3 min",
+      "coverImage": "https://images.unsplash.com/photo-1544717305-2782549b5136?w=900&auto=format&fit=crop&q=80",
+      "tags": ["공지", "부탄", "포털오픈", "팀푸"],
+      "isFeatured": true,
+      "views": 1240,
+      "comments": [
+        {
+          "id": "c-1",
+          "author": "Tashi Dorji",
+          "text": "팀푸에 공식 모임이 열리길 기다렸습니다. 매우 기대됩니다!",
+          "createdAt": "2026-03-11 09:30"
+        }
+      ]
+    },
+    {
+      "id": "post-2",
+      "title": {
+        "ko": "외계인 엘로힘과 지적설계: 신화가 아닌 현대 유전공학의 관점",
+        "en": "The Elohim and Intelligent Design: Genetic Science, Not Mythology"
+      },
+      "summary": {
+        "ko": "인간 게놈 프로젝트와 합성생물학의 눈부신 발전은 생명이 우연한 진화가 아닌 고도의 지적 생명공학으로 탄생했음을 뒷받침합니다.",
+        "en": "Advancements in synthetic biology and genomics demonstrate that biological complexity is the product of deliberate scientific engineering."
+      },
+      "content": {
+        "ko": "현대 분자생물학과 유전공학의 눈부신 발전은 생명의 정교함이 단순한 우연적 무작위 돌연변이만으로는 설명되기 어렵다는 사실을 끊임없이 보여주고 있습니다.\n\n1973년 라엘이 전달받은 메시지에서 엘로힘은 \"지구상의 모든 생명체는 고도의 DNA 합성 실험실에서 계획적으로 창조되었다\"고 분명히 밝혔습니다.\n\n### 현대 과학이 밝혀내는 진실들\n- **DNA의 디지털 정보성**: 4가지 염기서열(A, T, G, C)로 이루어진 완벽한 프로그래밍 언어.\n- **합성 생물학의 태동**: 현대 인류 과학자들도 이미 실험실에서 인공 합성 미생물을 창조하기 시작했습니다.\n- **신(God) 개념의 탈신비화**: 고대인들은 우주선과 과학 장비를 보고 '신'으로 착각하였으나, 이제 우리는 과학의 눈으로 그들의 본질을 이해합니다.",
+        "en": "Modern molecular biology and genetics increasingly reveal the astonishing informational depth of biological machinery.\n\nIn 1973, Raël received the Elohim messages stating clearly: \"All living forms on Earth were scientifically designed and engineered in sophisticated DNA laboratories.\""
+      },
+      "category": "science",
+      "author": "과학 철학 연구팀",
+      "date": "2026-03-02",
+      "readTime": "5 min",
+      "coverImage": "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=900&auto=format&fit=crop&q=80",
+      "tags": ["지적설계", "과학", "DNA", "생명공학"],
+      "isFeatured": true,
+      "views": 980,
+      "comments": []
+    },
+    {
+      "id": "post-3",
+      "title": {
+        "ko": "부탄의 국민행복지수(GNH)와 라엘리안 감각명상의 아름다운 조화",
+        "en": "Gross National Happiness (GNH) & Sensual Meditation: A Harmonious Synergy"
+      },
+      "summary": {
+        "ko": "물질 만능주의를 넘어 인간의 순수한 행복과 감각의 깨어있음을 중시하는 부탄의 가치는 라엘리안의 행복 철학과 완벽히 궤를 같이합니다.",
+        "en": "Bhutan’s world-renowned prioritization of happiness resonates deeply with the Raëlian philosophy of inner awakening and sensual meditation."
+      },
+      "content": {
+        "ko": "부탄은 경제 성장률(GDP) 대신 국민총행복(GNH)을 국가 발전의 지표로 삼는 세계에서 유일무이한 나라입니다.\n\n라엘리안 무브먼트의 핵심 수행인 '감각명상(Sensual Meditation)'은 뇌의 신경망을 깨워 지금 이 순간 오감으로 느껴지는 생명의 환희와 우주와의 일체감을 자각하도록 돕습니다.",
+        "en": "Bhutan is the world’s pioneer in placing Gross National Happiness (GNH) above GDP.\n\nSensual Meditation awakens neural pathways to experience the joy of existence in this present moment."
+      },
+      "category": "meditation",
+      "author": "행복과 명상 위원회",
+      "date": "2026-02-24",
+      "readTime": "4 min",
+      "coverImage": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=900&auto=format&fit=crop&q=80",
+      "tags": ["감각명상", "부탄GNH", "행복", "뇌과학"],
+      "isFeatured": false,
+      "views": 840,
+      "comments": []
+    }
+  ],
+  "books": [
+    {
+      "id": "book-1",
+      "title": {
+        "ko": "지적설계: 우주인으로부터의 메시지",
+        "en": "Intelligent Design: Message from the Designers"
+      },
+      "author": "라엘 (Raël)",
+      "description": {
+        "ko": "1973년과 1975년 엘로힘으로부터 직접 구술받은 인류의 기원, 인류 역사의 비밀, 그리고 지구의 미래를 담은 필독서.",
+        "en": "The seminal book recounting the direct encounters with the Elohim in 1973 and 1975, detailing the scientific origin of mankind."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/intelligent-design.pdf",
+      "pageCount": 384,
+      "languages": ["한국어", "English", "Français", "Español", "日本語"]
+    },
+    {
+      "id": "book-2",
+      "title": {
+        "ko": "감각명상: 행복과 각성을 위한 명상법",
+        "en": "Sensual Meditation: Awakening the Senses"
+      },
+      "author": "라엘 (Raël)",
+      "description": {
+        "ko": "죄의식 없는 기쁨, 오감의 온전한 개발, 뇌 신경세포 활성화를 통해 지금 이 순간 무한한 행복을 체험하는 지침서.",
+        "en": "A profound guide to experiencing infinite joy without guilt, activating neural happiness pathways through sensual mindfulness."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1512820790803-83ca734da794?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/sensual-meditation.pdf",
+      "pageCount": 220,
+      "languages": ["한국어", "English", "Français", "Deutsch"]
+    },
+    {
+      "id": "book-3",
+      "title": {
+        "ko": "천재정치 (Geniocracy): 지성과 평화의 사회 시스템",
+        "en": "Geniocracy: Government by Intellect and Compassion"
+      },
+      "author": "라엘 (Raël)",
+      "description": {
+        "ko": "인류의 생존과 번영을 위해 감정적 정치 대신 지성과 인류애를 갖춘 이들이 봉사하는 미래형 거버넌스 제안.",
+        "en": "A visionary socio-political blueprint advocating a democratic governance system guided by genuine compassion and intellect."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/geniocracy.pdf",
+      "pageCount": 190,
+      "languages": ["한국어", "English", "Français"]
+    }
+  ],
+  "events": [
+    {
+      "id": "evt-1",
+      "title": {
+        "ko": "부탄 팀푸 엘로힘 평화 명상 워크숍",
+        "en": "Bhutan Thimphu Elohim Peace Meditation Workshop"
+      },
+      "location": {
+        "ko": "팀푸 평화 컨벤션 센터 (Thimphu Peace Hall)",
+        "en": "Thimphu Peace Hall, Thimphu"
+      },
+      "date": "2026-04-12",
+      "time": "14:00 - 17:00 (GMT+6)",
+      "description": {
+        "ko": "오감의 정화, 뇌파 안정화, 그리고 우주적 사랑의 파동을 느끼는 감각명상 실습 및 무료 도서 증정.",
+        "en": "Hands-on sensual meditation practice, neural relaxation, cosmic love vibrations, and complimentary book gifting."
+      },
+      "isOnline": false,
+      "status": "upcoming"
+    },
+    {
+      "id": "evt-2",
+      "title": {
+        "ko": "2026 엘로힘 대사관 프로젝트 글로벌 온라인 포럼",
+        "en": "2026 Global Online Forum: Elohim Embassy Project"
+      },
+      "location": {
+        "ko": "Zoom 화상 회의실 (온라인)",
+        "en": "Zoom Conference Hall (Online)"
+      },
+      "date": "2026-04-26",
+      "time": "20:00 - 22:00 (KST / GMT+9)",
+      "description": {
+        "ko": "대사관 건축 조감도 공개 및 아시아 각국 대표단의 부탄 대사관 비전 발표 및 질의응답.",
+        "en": "Architectural blueprint presentations and international delegations discussing the Asian embassy vision."
+      },
+      "isOnline": true,
+      "meetingLink": "https://zoom.us/j/bhutan-rael-peace",
+      "status": "upcoming"
+    }
+  ],
+  "faqs": [
+    {
+      "q": {
+        "ko": "엘로힘(Elohim)은 누구인가요?",
+        "en": "Who are the Elohim?"
+      },
+      "a": {
+        "ko": "엘로힘은 고대 히브리어 복수형 단어로 \"하늘에서 온 사람들\"을 뜻합니다. 수천 년 전 지구에 도착하여 고도의 DNA 생명공학 기술로 인류를 비롯한 모든 지구 생명체를 창조한 고도로 발달한 외계 문명의 존재들입니다.",
+        "en": "Elohim is an ancient Hebrew plural noun translating to \"those who came from the sky.\" They are an advanced extraterrestrial civilization who scientifically designed and created all forms of life on Earth using advanced genetics."
+      }
+    },
+    {
+      "q": {
+        "ko": "라엘리안 무브먼트는 종교인가요?",
+        "en": "Is the Raëlian Movement a religion?"
+      },
+      "a": {
+        "ko": "라엘리안 무브먼트는 초자연적인 신이나 영혼을 믿지 않는 무신론적·과학적 철학 단체입니다. 신비주의 대신 이성과 과학, 생명에 대한 사랑과 평화를 실천하는 비영리 평화 운동입니다.",
+        "en": "The Raëlian Movement is an atheistic and scientifically grounded philosophical movement."
+      }
+    },
+    {
+      "q": {
+        "ko": "외계인 대사관은 왜 꼭 필요한가요?",
+        "en": "Why is the Extraterrestrial Embassy necessary?"
+      },
+      "a": {
+        "ko": "엘로힘은 인간의 자유의지를 절대적으로 존중합니다. 침략자나 지배자가 아닌 손님으로서 초대받기를 원하며, 공식적인 환영의 표시로서 외교적 치외법권과 중립성이 보장된 대사관을 준비했을 때 평화롭게 착륙하겠다고 밝혔습니다.",
+        "en": "The Elohim respect human free will completely and wish to be officially welcomed with an extraterritorial diplomatic embassy."
+      }
+    }
+  ],
+  "admins": [
+    {
+      "id": "admin-master",
+      "email": "navihan01@gmail.com",
+      "name": "최고 관리자 (navihan)",
+      "role": "super_admin",
+      "password": "rael2026!",
+      "status": "active"
+    }
+  ],
+  "invites": []
+}

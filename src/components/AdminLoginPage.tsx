@@ -30,7 +30,7 @@ export const AdminLoginPage: React.FC = () => {
       let tokenParam = url.searchParams.get('token');
       let nameParam = url.searchParams.get('name');
       
-      // Also check hash query params if using hash router: #/admin/login?email=...
+      // Also check hash query params if using hash router: #/admin0/login?email=...
       if (window.location.hash.includes('?')) {
         const hashQuery = window.location.hash.split('?')[1];
         const hashParams = new URLSearchParams(hashQuery);
@@ -117,8 +117,8 @@ export const AdminLoginPage: React.FC = () => {
           </div>
 
           <div>
-            <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#FFF7ED] text-[#C2410C] text-[11px] font-bold uppercase tracking-wider mb-1.5">
-              admin/login
+            <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#FFF7ED] text-[#C2410C] text-[11px] font-bold uppercase tracking-wider mb-1.5 font-mono">
+              admin0/login
             </div>
             <h1 className="text-2xl font-bold text-[#1E1915] font-display">
               {language === 'ko' ? '관리자 보안 로그인' : 'Admin Portal Login'}

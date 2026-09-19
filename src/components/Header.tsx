@@ -3,7 +3,16 @@ import { useSite } from '../context/SiteContext';
 import { Globe, Settings, Menu, X, ArrowRight, Sparkles, BookOpen, Compass, Building2, Calendar, Newspaper, Mail } from 'lucide-react';
 
 export const Header: React.FC = () => {
-  const { theme, language, setLanguage, setIsAdminOpen, isAdminAuthenticated } = useSite();
+  const { 
+    theme, 
+    language, 
+    setLanguage, 
+    setIsAdminOpen, 
+    isAdminOpen, 
+    isAdminAuthenticated, 
+    navigate, 
+    currentPath 
+  } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -15,6 +24,28 @@ export const Header: React.FC = () => {
     { href: '#events', label: language === 'ko' ? '세미나 & 일정' : 'Events', icon: Calendar },
     { href: '#contact', label: language === 'ko' ? '연락처' : 'Contact', icon: Mail },
   ];
+
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    if (isAdminOpen) {
+      setIsAdminOpen(false);
+    }
+    if (currentPath !== '/') {
+      navigate('/');
+      setTimeout(() => {
+        const el = document.querySelector(href);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 120);
+    } else {
+      const el = document.querySelector(href);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+    setMobileMenuOpen(false);
+  };
 
   const toggleLanguage = () => {
     setLanguage(language === 'ko' ? 'en' : 'ko');
@@ -42,7 +73,16 @@ export const Header: React.FC = () => {
         <div className="flex items-center justify-between h-20">
           
           {/* Logo */}
-          <a href="#" className="flex items-center gap-3 group">
+          <a 
+            href="#" 
+            onClick={(e) => {
+              e.preventDefault();
+              if (isAdminOpen) setIsAdminOpen(false);
+              if (currentPath !== '/') navigate('/');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="flex items-center gap-3 group"
+          >
             {/* Elegant Emblem representing Infinity in Time & Space (Symbol of Elohim) */}
             <div 
               className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold shadow-md transition-transform group-hover:scale-105"
@@ -65,8 +105,10 @@ export const Header: React.FC = () => {
               <span className="text-lg sm:text-xl font-bold tracking-tight text-[#1F1B18] font-display flex items-center gap-1.5">
                 {language === 'ko' ? '부탄 라엘리안 무브먼트' : 'Bhutan Raëlian Movement'}
               </span>
-              <span className="text-[11px] text-[#786C60] tracking-wider uppercase font-medium">
-                {language === 'ko' ? 'KINGDOM OF BHUTAN • ELOHIM EMBASSY' : 'KINGDOM OF BHUTAN • ELOHIM EMBASSY'}
+              <span className="text-[11px] text-[#786C60] tracking-wider uppercase font-medium flex items-center gap-1.5">
+                <span>KINGDOM OF BHUTAN</span>
+                <span className="text-[11px] font-normal text-[#968676] font-dzongkha">འབྲུག་ཡུལ།</span>
+                <span>• ELOHIM EMBASSY</span>
               </span>
             </div>
           </a>
@@ -77,7 +119,8 @@ export const Header: React.FC = () => {
               <a
                 key={link.href}
                 href={link.href}
-                className="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors relative py-1 hover:font-semibold"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors relative py-1 hover:font-semibold cursor-pointer"
               >
                 {link.label}
               </a>
@@ -138,8 +181,8 @@ export const Header: React.FC = () => {
               <a
                 key={link.href}
                 href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] hover:text-[#EA580C] transition-colors"
+                onClick={(e) => handleNavClick(e, link.href)}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] hover:text-[#EA580C] transition-colors cursor-pointer"
               >
                 <Icon className="w-4 h-4 text-[#9C8C7C]" />
                 <span>{link.label}</span>

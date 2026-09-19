@@ -136,7 +136,7 @@ export const AdminManagementTab: React.FC<{
       token: token
     }).toString();
 
-    const loginUrl = `${origin}${pathname}#/admin/login?${queryParams}`;
+    const loginUrl = `${origin}${pathname}#/admin0/login?${queryParams}`;
 
     setLastInvitedResult({
       invite: { ...res.invite, tempPassword: tempPass },
@@ -174,7 +174,7 @@ export const AdminManagementTab: React.FC<{
       token: token
     }).toString();
 
-    const loginUrl = `${origin}${pathname}#/admin/login?${queryParams}`;
+    const loginUrl = `${origin}${pathname}#/admin0/login?${queryParams}`;
 
     navigator.clipboard.writeText(loginUrl);
     setCopiedInviteId(invite.id);
