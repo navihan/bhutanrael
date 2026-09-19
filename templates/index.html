@@ -1,0 +1,551 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative overflow-hidden bg-[#FAF7F2] py-20 lg:py-28 border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <!-- Text Area -->
+      <div class="lg:col-span-7 space-y-6">
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white border border-[#DDD0C0] text-xs font-semibold text-[#8C4A1E] shadow-2xs">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5 text-[#EA580C]"></i>
+          <span>{{ site_data.content.hero.badge[lang] }}</span>
+        </div>
+
+        <h1 class="text-3xl sm:text-5xl lg:text-5xl font-bold tracking-tight text-[#1F1B18] font-display leading-[1.18]">
+          {{ site_data.content.hero.title[lang] }}
+        </h1>
+
+        <p class="text-base sm:text-lg text-[#5A4F44] leading-relaxed max-w-2xl">
+          {{ site_data.content.hero.subtitle[lang] }}
+        </p>
+
+        <!-- CTA Action Buttons -->
+        <div class="pt-2 flex flex-wrap items-center gap-4">
+          <a href="{{ site_data.content.hero.primaryCtaLink }}" class="px-6 py-3.5 rounded-xl text-white font-semibold text-sm shadow-md hover:opacity-95 transition-all flex items-center gap-2" style="background-color: {{ site_data.theme.accentColor or '#EA580C' }};">
+            <span>{{ site_data.content.hero.primaryCtaText[lang] }}</span>
+            <i data-lucide="arrow-right" class="w-4 h-4"></i>
+          </a>
+
+          <a href="{{ site_data.content.hero.secondaryCtaLink }}" class="px-6 py-3.5 rounded-xl bg-white border border-[#D5C7B5] text-[#3E342B] hover:bg-[#F2EAE0] font-semibold text-sm shadow-xs transition-colors flex items-center gap-2">
+            <i data-lucide="book-open" class="w-4 h-4 text-[#8C7A68]"></i>
+            <span>{{ site_data.content.hero.secondaryCtaText[lang] }}</span>
+          </a>
+        </div>
+
+        <!-- Metric highlights -->
+        <div class="pt-6 grid grid-cols-3 gap-4 border-t border-[#E8DFD3] max-w-xl text-xs sm:text-sm">
+          <div>
+            <span class="block text-xl sm:text-2xl font-bold font-display text-[#1F1B18]">1973</span>
+            <span class="text-[#786C60]">{{ '최초 조우 및 메시지' if lang == 'ko' else 'First Encounter' }}</span>
+          </div>
+          <div>
+            <span class="block text-xl sm:text-2xl font-bold font-display text-[#1F1B18]">104+</span>
+            <span class="text-[#786C60]">{{ '전세계 보급 국가' if lang == 'ko' else 'Countries Worldwide' }}</span>
+          </div>
+          <div>
+            <span class="block text-xl sm:text-2xl font-bold font-display text-[#1F1B18]">GNH</span>
+            <span class="text-[#786C60]">{{ '부탄 평화정신 조화' if lang == 'ko' else 'Gross National Happiness' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hero Visual Image -->
+      <div class="lg:col-span-5 relative">
+        <div class="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-white aspect-[4/3] sm:aspect-square">
+          <img 
+            src="{{ site_data.content.hero.heroImage }}" 
+            alt="Bhutan Mountains & Elohim Embassy Concept" 
+            class="w-full h-full object-cover transform hover:scale-105 transition-transform duration-700"
+          >
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+          <div class="absolute bottom-6 left-6 right-6 text-white">
+            <span class="text-xs uppercase tracking-widest text-amber-300 font-bold block mb-1">
+              {{ '부탄 왕국 엘로힘 대사관 비전' if lang == 'ko' else 'Extraterrestrial Embassy in Bhutan' }}
+            </span>
+            <p class="text-sm font-medium text-white/90">
+              {{ '평화로운 히말라야의 안식처에서 우주적 기원을 영접합니다' if lang == 'ko' else 'Embracing our cosmic origin in the peaceful Himalayas' }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="py-20 bg-white border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <div class="lg:col-span-5">
+        <div class="rounded-2xl overflow-hidden shadow-xl border border-[#E8DFD3] relative aspect-[4/3]">
+          <img src="{{ site_data.content.about.aboutImage }}" alt="About Raelian Movement" class="w-full h-full object-cover">
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 space-y-5">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+          {{ '기원과 철학' if lang == 'ko' else 'ORIGIN & PHILOSOPHY' }}
+        </span>
+        <h2 class="text-2xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+          {{ site_data.content.about.title[lang] }}
+        </h2>
+        <p class="text-sm sm:text-base font-medium text-[#8C4A1E]">
+          {{ site_data.content.about.subtitle[lang] }}
+        </p>
+        <p class="text-sm sm:text-base text-[#5A4F44] leading-relaxed whitespace-pre-line">
+          {{ site_data.content.about.description[lang] }}
+        </p>
+
+        <!-- Quote Block -->
+        <blockquote class="p-5 rounded-2xl bg-[#FAF7F2] border-l-4 border-[#EA580C] mt-4">
+          <p class="text-base italic text-[#2E2721] font-display">
+            "{{ site_data.content.about.quote[lang] }}"
+          </p>
+          <cite class="block text-xs font-semibold text-[#8C7A68] mt-2 not-italic">
+            — {{ site_data.content.about.quoteAuthor[lang] }}
+          </cite>
+        </blockquote>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Philosophy & Intelligent Design Section -->
+<section id="philosophy" class="py-20 bg-[#FAF7F2] border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+      <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+        {{ '핵심 원리' if lang == 'ko' else 'CORE PRINCIPLES' }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+        {{ '라엘리안 무브먼트 핵심' if lang == 'ko' else 'Intelligent Design & 4 Core Pillars' }}
+      </h2>
+      <p class="text-sm sm:text-base text-[#615446]">
+        {{ '신비주의와 맹신을 거부하고, 과학적 이성과 오감의 깨어남을 바탕으로 한 새로운 인본주의 철학' if lang == 'ko' else 'A scientific humanist philosophy based on reason, sensory awakening, and universal love.' }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {% for pillar in site_data.philosophyPillars %}
+      <div class="bg-white p-7 rounded-2xl border border-[#E0D5C7] shadow-xs space-y-4 hover:-translate-y-1 transition-transform flex flex-col justify-between">
+        <div class="space-y-3">
+          <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-[#EA580C]">
+            {% if loop.index == 1 %}<i data-lucide="dna" class="w-6 h-6"></i>
+            {% elif loop.index == 2 %}<i data-lucide="heart" class="w-6 h-6"></i>
+            {% elif loop.index == 3 %}<i data-lucide="building-2" class="w-6 h-6"></i>
+            {% else %}<i data-lucide="infinity" class="w-6 h-6"></i>{% endif %}
+          </div>
+          <h3 class="font-bold text-lg font-display text-[#1F1B18]">
+            {{ pillar.title[lang] }}
+          </h3>
+          <p class="text-xs font-semibold text-[#EA580C]">
+            {{ pillar.tagline[lang] }}
+          </p>
+          <ul class="space-y-1.5 text-xs text-[#615446] pt-2 border-t border-[#F0E8DC]">
+            {% for pt in pillar.points[lang] %}
+            <li class="flex items-start gap-1.5">
+              <span class="text-[#EA580C] font-bold">•</span>
+              <span>{{ pt }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Embassy Project Section -->
+<section id="embassy" class="py-20 bg-white border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      
+      <div class="lg:col-span-7 space-y-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+          {{ '글로벌 프로젝트' if lang == 'ko' else 'GLOBAL INITIATIVE' }}
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+          {{ site_data.content.embassy.title[lang] }}
+        </h2>
+        <p class="text-sm sm:text-base font-semibold text-[#8C4A1E]">
+          {{ site_data.content.embassy.subtitle[lang] }}
+        </p>
+        <p class="text-sm sm:text-base text-[#5A4F44] leading-relaxed">
+          {{ site_data.content.embassy.description[lang] }}
+        </p>
+
+        <!-- Highlights Checklist -->
+        <div class="space-y-3 pt-2">
+          {% for pt in site_data.content.embassy.highlightPoints[lang] %}
+          <div class="flex items-start gap-3">
+            <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+              <i data-lucide="check" class="w-3.5 h-3.5"></i>
+            </div>
+            <span class="text-sm font-medium text-[#3A3129]">{{ pt }}</span>
+          </div>
+          {% endfor %}
+        </div>
+
+        <div class="pt-4 flex flex-wrap gap-4">
+          <a href="https://elohimembassy.org" target="_blank" class="px-5 py-3 rounded-xl bg-[#1F1B18] text-white hover:bg-[#382F26] text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2">
+            <span>{{ '대사관 공식 조감도 & 계획서' if lang == 'ko' else 'View Architectural Blueprints' }}</span>
+            <i data-lucide="external-link" class="w-4 h-4"></i>
+          </a>
+          <a href="#contact" class="px-5 py-3 rounded-xl border border-[#DDD0C0] text-[#4A4036] hover:bg-[#F5EFEB] text-xs sm:text-sm font-semibold transition-colors">
+            {{ '부탄 유치 제안 문의' if lang == 'ko' else 'Inquire about Bhutan Proposal' }}
+          </a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="rounded-3xl overflow-hidden shadow-2xl border-4 border-[#F0E8DC] aspect-[4/3]">
+          <img src="{{ site_data.content.embassy.embassyImage }}" alt="Elohim Embassy Vision" class="w-full h-full object-cover">
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- News & Articles Section (All Posts Included with Interactive Filter & Board Writing Access) -->
+<section id="articles" class="py-20 bg-[#FAF7F2] border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+      <div>
+        <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+          {{ '공식 게시판 & 소식' if lang == 'ko' else 'COMMUNITY BOARD & NEWS' }}
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+          {{ '부탄 라엘리안 공식 게시판 & 아티클' if lang == 'ko' else 'Official Community Board & Articles' }}
+        </h2>
+        <p class="text-xs sm:text-sm text-[#7A6B5D] mt-1">
+          {{ '등록된 모든 게시글을 하나도 빠짐없이 열람하고, 관리자 콘솔을 통해 새로운 글을 등록할 수 있습니다.' if lang == 'ko' else 'All published articles and board entries in Bhutan.' }}
+        </p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        {% if session.get('admin_logged_in') %}
+        <!-- Direct Quick Link to Board Writing for logged-in Admin -->
+        <a href="{{ url_for('admin_dashboard') }}#tab-posts" class="px-4 py-2.5 rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold transition-all shadow-xs flex items-center gap-1.5">
+          <i data-lucide="pen-tool" class="w-4 h-4"></i>
+          <span>{{ '게시판 새 글 등록' if lang == 'ko' else 'Write to Board' }}</span>
+        </a>
+        {% endif %}
+        <a href="{{ url_for('articles_list') }}" class="px-4 py-2.5 rounded-xl bg-white border border-[#DDD0C0] text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-1">
+          <span>{{ '게시판 전용 뷰' if lang == 'ko' else 'Full Board' }}</span>
+          <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+        </a>
+      </div>
+    </div>
+
+    <!-- Category Filters for Main Page Board -->
+    <div class="flex flex-wrap items-center gap-2 mb-8">
+      <button onclick="filterMainPosts('all')" id="filter-btn-all" class="main-post-filter-btn px-4 py-1.5 rounded-full text-xs font-bold transition-colors bg-[#1F1B18] text-white cursor-pointer">
+        {{ '전체 (' ~ site_data.posts|length ~ ')' }}
+      </button>
+      <button onclick="filterMainPosts('announcement')" id="filter-btn-announcement" class="main-post-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold transition-colors bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC] cursor-pointer">
+        {{ '공지 및 소식' if lang == 'ko' else 'Announcements' }}
+      </button>
+      <button onclick="filterMainPosts('science')" id="filter-btn-science" class="main-post-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold transition-colors bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC] cursor-pointer">
+        {{ '지적설계 & 과학' if lang == 'ko' else 'Science' }}
+      </button>
+      <button onclick="filterMainPosts('meditation')" id="filter-btn-meditation" class="main-post-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold transition-colors bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC] cursor-pointer">
+        {{ '감각명상 & 행복' if lang == 'ko' else 'Meditation' }}
+      </button>
+      <button onclick="filterMainPosts('embassy')" id="filter-btn-embassy" class="main-post-filter-btn px-4 py-1.5 rounded-full text-xs font-semibold transition-colors bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC] cursor-pointer">
+        {{ '대사관 프로젝트' if lang == 'ko' else 'Embassy' }}
+      </button>
+    </div>
+
+    <!-- All Posts Grid (No slice restriction, all posts included!) -->
+    <div id="main-posts-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {% for post in site_data.posts %}
+      <article data-category="{{ post.category }}" class="main-post-card bg-white rounded-2xl overflow-hidden border border-[#E0D5C7] shadow-xs flex flex-col hover:shadow-md transition-all">
+        <div class="aspect-video relative overflow-hidden bg-stone-100">
+          <img src="{{ post.coverImage }}" alt="{{ post.title[lang] }}" class="w-full h-full object-cover">
+          <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-[#8C4A1E]">
+            {% if post.category == 'announcement' %}공지
+            {% elif post.category == 'science' %}과학/지적설계
+            {% elif post.category == 'meditation' %}명상/행복
+            {% elif post.category == 'embassy' %}대사관
+            {% else %}{{ post.category }}{% endif %}
+          </span>
+        </div>
+
+        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 text-xs text-[#8A7968]">
+              <span>{{ post.date }}</span>
+              <span>•</span>
+              <span>{{ post.readTime }}</span>
+              <span>•</span>
+              <span><i data-lucide="eye" class="w-3.5 h-3.5 inline"></i> {{ post.views or 0 }}</span>
+            </div>
+            <h3 class="font-bold text-lg font-display text-[#1F1B18] hover:text-[#EA580C] transition-colors line-clamp-2">
+              <a href="{{ url_for('article_detail', post_id=post.id) }}">{{ post.title[lang] }}</a>
+            </h3>
+            <p class="text-xs sm:text-sm text-[#615446] line-clamp-3 leading-relaxed">
+              {{ post.summary[lang] }}
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-[#F0E8DC] flex items-center justify-between text-xs">
+            <span class="text-[#8A7968] font-medium">{{ post.author }}</span>
+            <a href="{{ url_for('article_detail', post_id=post.id) }}" class="text-[#EA580C] font-semibold hover:underline flex items-center gap-1">
+              <span>{{ '자세히 보기' if lang == 'ko' else 'Read More' }}</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+<script>
+  function filterMainPosts(category) {
+    const cards = document.querySelectorAll('.main-post-card');
+    cards.forEach(card => {
+      if (category === 'all' || card.getAttribute('data-category') === category) {
+        card.style.display = 'flex';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+
+    const buttons = document.querySelectorAll('.main-post-filter-btn');
+    buttons.forEach(btn => {
+      btn.classList.remove('bg-[#1F1B18]', 'text-white');
+      btn.classList.add('bg-white', 'border', 'border-[#D5C7B5]', 'text-[#5A4F44]');
+    });
+
+    const activeBtn = document.getElementById('filter-btn-' + category);
+    if (activeBtn) {
+      activeBtn.classList.add('bg-[#1F1B18]', 'text-white');
+      activeBtn.classList.remove('bg-white', 'border', 'border-[#D5C7B5]', 'text-[#5A4F44]');
+    }
+  }
+</script>
+
+<!-- Free eBooks Download Section -->
+<section id="books" class="py-20 bg-white border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+      <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+        {{ '무료 도서' if lang == 'ko' else 'FREE EBOOKS' }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+        {{ '진실을 알리는 도서 무료 다운로드' if lang == 'ko' else 'Free Digital Book Downloads' }}
+      </h2>
+      <p class="text-sm sm:text-base text-[#615446]">
+        {{ '창조자 엘로힘이 전달한 모든 메시지는 인류 전체를 위한 인류 공공의 자산이므로 100% 무료로 다운로드할 수 있습니다.' if lang == 'ko' else 'The Elohim messages are a gift to all humanity, free to download in multiple languages.' }}
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for book in site_data.books %}
+      <div class="bg-[#FAF7F2] rounded-2xl p-6 border border-[#E0D5C7] flex flex-col justify-between space-y-6">
+        <div class="space-y-4">
+          <div class="aspect-[3/4] rounded-xl overflow-hidden shadow-md max-w-[200px] mx-auto border-2 border-white">
+            <img src="{{ book.coverImage }}" alt="{{ book.title[lang] }}" class="w-full h-full object-cover">
+          </div>
+          <div class="text-center space-y-1.5">
+            <h3 class="font-bold text-base font-display text-[#1F1B18]">{{ book.title[lang] }}</h3>
+            <p class="text-xs text-[#8C7A68]">{{ book.author }} • {{ book.pageCount }} pages</p>
+          </div>
+          <p class="text-xs text-[#615446] leading-relaxed text-center">
+            {{ book.description[lang] }}
+          </p>
+        </div>
+
+        <div class="pt-2">
+          <a href="{{ book.downloadUrl }}" target="_blank" class="w-full py-2.5 rounded-xl bg-white border border-[#D5C7B5] hover:bg-[#F2EAE0] text-xs font-semibold text-[#3A3129] transition-colors flex items-center justify-center gap-1.5 shadow-2xs">
+            <i data-lucide="download" class="w-4 h-4 text-[#EA580C]"></i>
+            <span>{{ 'PDF 무료 다운로드' if lang == 'ko' else 'Download Free PDF' }}</span>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Events Section -->
+<section id="events" class="py-20 bg-[#FAF7F2] border-b border-[#E8DFD3]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+      <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+        {{ '세미나 및 워크숍' if lang == 'ko' else 'EVENTS & GATHERINGS' }}
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+        {{ '2026 부탄 정기 평화 명상 및 모임' if lang == 'ko' else '2026 Peace Gatherings & Workshops' }}
+      </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+      {% for evt in site_data.events %}
+      <div class="bg-white rounded-2xl p-6 border border-[#E0D5C7] shadow-xs space-y-4">
+        <div class="flex items-center justify-between text-xs">
+          <span class="px-2.5 py-1 rounded-md font-bold {{ 'bg-blue-100 text-blue-800' if evt.isOnline else 'bg-emerald-100 text-emerald-800' }}">
+            {{ '온라인 화상 세미나' if evt.isOnline else '오프라인 현장 워크숍' if lang == 'ko' else 'Online' if evt.isOnline else 'In-Person' }}
+          </span>
+          <span class="text-[#8C7A68] font-medium">{{ evt.date }}</span>
+        </div>
+
+        <h3 class="font-bold text-lg font-display text-[#1F1B18]">{{ evt.title[lang] }}</h3>
+        
+        <div class="space-y-1.5 text-xs text-[#615446]">
+          <div class="flex items-center gap-2">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-[#EA580C]"></i>
+            <span>{{ evt.location[lang] }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <i data-lucide="clock" class="w-3.5 h-3.5 text-[#EA580C]"></i>
+            <span>{{ evt.time }}</span>
+          </div>
+        </div>
+
+        <p class="text-xs text-[#5A4F44] leading-relaxed pt-2 border-t border-[#F0E8DC]">
+          {{ evt.description[lang] }}
+        </p>
+
+        <div class="pt-2">
+          {% if evt.meetingLink %}
+          <a href="{{ evt.meetingLink }}" target="_blank" class="w-full py-2 rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-semibold text-center block transition-colors">
+            {{ '줌(Zoom) 참가 링크 바로가기' if lang == 'ko' else 'Join via Zoom' }}
+          </a>
+          {% else %}
+          <a href="#contact" class="w-full py-2 rounded-xl bg-[#F0E8DC] hover:bg-[#E5DACB] text-[#3A3129] text-xs font-semibold text-center block transition-colors">
+            {{ '참가 신청 및 문의' if lang == 'ko' else 'RSVP via Contact' }}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-20 bg-white border-b border-[#E8DFD3]">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center space-y-4 mb-16">
+      <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+        FAQ
+      </span>
+      <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18]">
+        {{ '자주 묻는 질문' if lang == 'ko' else 'Frequently Asked Questions' }}
+      </h2>
+    </div>
+
+    <div class="space-y-4">
+      {% for faq in site_data.faqs %}
+      <div class="p-6 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7]">
+        <h3 class="font-bold text-base text-[#1F1B18] mb-2 flex items-center gap-2 font-display">
+          <span class="text-[#EA580C]">Q.</span>
+          <span>{{ faq.q[lang] }}</span>
+        </h3>
+        <p class="text-xs sm:text-sm text-[#5A4F44] leading-relaxed pl-5">
+          {{ faq.a[lang] }}
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Contact Form Section -->
+<section id="contact" class="py-20 bg-[#FAF7F2]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+      
+      <!-- Contact Info -->
+      <div class="lg:col-span-5 space-y-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+          {{ '연락처 & 문의' if lang == 'ko' else 'CONTACT & CONNECT' }}
+        </span>
+        <h2 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18] tracking-tight">
+          {{ '부탄 라엘리안 무브먼트와 함께하세요' if lang == 'ko' else 'Connect with Bhutan Raëlians' }}
+        </h2>
+        <p class="text-sm text-[#5A4F44] leading-relaxed">
+          {{ '도서 문의, 세미나 참석, 대사관 프로젝트 지원 등 궁금한 점이 있으시면 언제든지 메시지를 남겨주세요.' if lang == 'ko' else 'Feel free to reach out for questions regarding literature, peace seminars, or the Embassy initiative.' }}
+        </p>
+
+        <div class="space-y-4 pt-4 text-xs sm:text-sm text-[#4A4036]">
+          <div class="flex items-start gap-3">
+            <i data-lucide="map-pin" class="w-5 h-5 text-[#EA580C] shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="block text-[#1F1B18]">{{ '사무국 주소' if lang == 'ko' else 'Office Location' }}</strong>
+              <span>{{ site_data.content.contact.address[lang] }}</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <i data-lucide="mail" class="w-5 h-5 text-[#EA580C] shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="block text-[#1F1B18]">{{ '대표 이메일' if lang == 'ko' else 'Email' }}</strong>
+              <span>{{ site_data.content.contact.email }}</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <i data-lucide="phone" class="w-5 h-5 text-[#EA580C] shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="block text-[#1F1B18]">{{ '연락처' if lang == 'ko' else 'Phone' }}</strong>
+              <span>{{ site_data.content.contact.phone }}</span>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <i data-lucide="calendar" class="w-5 h-5 text-[#EA580C] shrink-0 mt-0.5"></i>
+            <div>
+              <strong class="block text-[#1F1B18]">{{ '방문 안내' if lang == 'ko' else 'Visiting Hours' }}</strong>
+              <span>{{ site_data.content.contact.meetingHours[lang] }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="lg:col-span-7 bg-white p-8 rounded-3xl border border-[#E0D5C7] shadow-lg">
+        <form id="contact-form" action="{{ url_for('contact_submit') }}" method="POST" class="space-y-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1.5">{{ '이름' if lang == 'ko' else 'Your Name' }} *</label>
+              <input type="text" name="name" required placeholder="홍길동" class="w-full px-4 py-3 rounded-xl border border-[#D5C7B5] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#EA580C]">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1.5">{{ '이메일 주소' if lang == 'ko' else 'Email Address' }} *</label>
+              <input type="email" name="email" required placeholder="your@email.com" class="w-full px-4 py-3 rounded-xl border border-[#D5C7B5] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#EA580C]">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-[#3A3129] mb-1.5">{{ '연락처 / 전화번호' if lang == 'ko' else 'Phone Number' }}</label>
+            <input type="tel" name="phone" placeholder="+975 ..." class="w-full px-4 py-3 rounded-xl border border-[#D5C7B5] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#EA580C]">
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-[#3A3129] mb-1.5">{{ '문의 내용' if lang == 'ko' else 'Message' }} *</label>
+            <textarea name="message" rows="4" required placeholder="{{ '궁금하신 내용을 입력해주세요.' if lang == 'ko' else 'How can we help you?' }}" class="w-full px-4 py-3 rounded-xl border border-[#D5C7B5] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#EA580C]"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-4 rounded-xl text-white font-bold text-sm shadow-md hover:opacity-95 transition-all flex items-center justify-center gap-2 cursor-pointer" style="background-color: {{ site_data.theme.accentColor or '#EA580C' }};">
+            <i data-lucide="send" class="w-4 h-4"></i>
+            <span>{{ '메시지 전송하기 (navihan01@gmail.com)' if lang == 'ko' else 'Send Message' }}</span>
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}

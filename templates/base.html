@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="{{ lang or 'ko' }}" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title or site_data.seo.metaTitle[lang] }}</title>
+  <meta name="description" content="{{ site_data.seo.metaDescription[lang] }}">
+  <meta name="keywords" content="{{ site_data.seo.keywords }}">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%23EA580C'/><circle cx='50' cy='50' r='38' fill='none' stroke='white' stroke-width='6'/><path d='M50,20 A30,30 0 0,1 80,50 A30,30 0 0,1 50,80 A16,16 0 0,1 34,64 A16,16 0 0,1 50,48' fill='none' stroke='white' stroke-width='6'/><circle cx='50' cy='50' r='4' fill='white'/></svg>">
+
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,600&family=Noto+Sans+KR:wght@300;400;500;600;700;800&family=Noto+Sans+Tibetan:wght@400;500;600;700&family=Noto+Serif+Tibetan:wght@400;600;700&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    html {
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans KR', 'Noto Sans Tibetan', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: {{ site_data.theme.bgColor or '#FAF7F2' }};
+      color: #1F1B18;
+    }
+    .font-display {
+      font-family: 'Outfit', 'Noto Sans KR', 'Noto Serif Tibetan', 'Noto Sans Tibetan', 'Apple SD Gothic Neo', sans-serif;
+      letter-spacing: -0.015em;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-orange-200 selection:text-orange-950">
+
+  <!-- Admin Bar (If Logged In) -->
+  {% if session.get('admin_logged_in') %}
+  <div class="bg-[#1E1915] text-[#E8DFD3] border-b border-[#3D332B] px-4 py-2 text-xs sticky top-0 z-50 flex items-center justify-between shadow-md">
+    <div class="max-w-7xl mx-auto w-full flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-bold text-white">{{ '관리자 접속 중' if lang == 'ko' else 'Admin Active' }}:</span>
+        <span class="text-[#C8B8A6]">{{ session.get('admin_email') }} ({{ session.get('admin_role', 'admin') }})</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="{{ url_for('admin_dashboard') }}" class="px-3 py-1 rounded bg-[#EA580C] hover:bg-[#C2410C] text-white font-semibold transition-colors flex items-center gap-1.5">
+          <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+          <span>{{ '관리자 대시보드' if lang == 'ko' else 'Admin Dashboard' }}</span>
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="px-2.5 py-1 rounded bg-[#3A3129] hover:bg-[#4D4238] text-rose-300 hover:text-white transition-colors flex items-center gap-1">
+          <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+          <span>{{ '로그아웃' if lang == 'ko' else 'Logout' }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Optional Top Announcement -->
+  {% if site_data.theme.showAnnouncement %}
+  <div class="w-full text-white text-xs sm:text-sm font-medium py-2 px-4 flex items-center justify-center text-center shadow-xs transition-colors" style="background-color: {{ site_data.theme.accentColor or '#EA580C' }};">
+    <a href="{{ site_data.theme.announcementLink }}" class="flex items-center gap-1.5 hover:underline">
+      <span>{{ site_data.theme.announcementText[lang] }}</span>
+      <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+    </a>
+  </div>
+  {% endif %}
+
+  <!-- Main Sticky Header -->
+  <header class="sticky top-0 z-40 w-full backdrop-blur-md bg-[#FAF7F2]/90 border-b border-[#E8DFD3] transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo -->
+        <a href="{{ url_for('index') }}" class="flex items-center gap-3 group">
+          <div class="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold shadow-md transition-transform group-hover:scale-105" style="background-color: {{ site_data.theme.accentColor or '#EA580C' }};">
+            <svg viewBox="0 0 100 100" class="w-7 h-7 fill-none stroke-white stroke-[7]" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="50" cy="50" r="42" class="opacity-30" />
+              <path d="M50,16 A34,34 0 0,1 84,50 A34,34 0 0,1 50,84 A18,18 0 0,1 32,66 A18,18 0 0,1 50,48 A8,8 0 0,1 58,56" />
+              <circle cx="50" cy="50" r="4" fill="white" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-lg sm:text-xl font-bold tracking-tight text-[#1F1B18] font-display">
+              {{ '부탄 라엘리안 무브먼트' if lang == 'ko' else 'Bhutan Raëlian Movement' }}
+            </span>
+            <span class="text-[11px] text-[#786C60] tracking-wider uppercase font-medium flex items-center gap-1.5">
+              <span>KINGDOM OF BHUTAN</span>
+              <span class="text-[11px] font-normal text-[#968676] font-dzongkha">འབྲུག་ཡུལ།</span>
+              <span>• ELOHIM EMBASSY</span>
+            </span>
+          </div>
+        </a>
+
+        <!-- Desktop Navigation -->
+        <nav class="hidden lg:flex items-center gap-6">
+          <a href="{{ url_for('index') }}#about" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '라엘' if lang == 'ko' else 'About' }}
+          </a>
+          <a href="{{ url_for('index') }}#philosophy" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '목표' if lang == 'ko' else 'Philosophy' }}
+          </a>
+          <a href="{{ url_for('index') }}#embassy" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '엘로힘 대사관' if lang == 'ko' else 'Embassy' }}
+          </a>
+          <a href="{{ url_for('articles_list') }}" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '최신메시지' if lang == 'ko' else 'News & Articles' }}
+          </a>
+          <a href="{{ url_for('index') }}#books" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '도서 다운로드' if lang == 'ko' else 'eBooks' }}
+          </a>
+          <a href="{{ url_for('index') }}#events" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '행복아카데미' if lang == 'ko' else 'Events' }}
+          </a>
+          <a href="{{ url_for('index') }}#contact" class="text-sm font-medium text-[#4A4036] hover:text-[#EA580C] transition-colors">
+            {{ '문의' if lang == 'ko' else 'Contact' }}
+          </a>
+        </nav>
+
+        <!-- Right Controls -->
+        <div class="flex items-center gap-2.5">
+          <!-- Language Toggle -->
+          <a href="{{ url_for('toggle_language', lang='en' if lang == 'ko' else 'ko') }}" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#D5C7B5] text-xs font-semibold text-[#4A4036] hover:bg-[#F0E8DC] transition-colors">
+            <i data-lucide="globe" class="w-3.5 h-3.5 text-[#8C7A68]"></i>
+            <span>{{ 'EN' if lang == 'ko' else '한글' }}</span>
+          </a>
+
+          <!-- Admin Portal Link (Only visible when already authenticated as admin) -->
+          {% if session.get('admin_logged_in') %}
+            <a href="{{ url_for('admin_dashboard') }}" class="px-3.5 py-1.5 rounded-full text-xs font-semibold text-white shadow-xs hover:opacity-90 transition-all flex items-center gap-1.5" style="background-color: {{ site_data.theme.accentColor or '#EA580C' }};">
+              <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+              <span>{{ '관리자' if lang == 'ko' else 'Admin' }}</span>
+            </a>
+          {% endif %}
+
+          <!-- Mobile Menu Button -->
+          <button id="mobile-menu-btn" class="lg:hidden p-2 rounded-lg text-[#4A4036] hover:bg-[#EFE8DC] transition-colors" onclick="toggleMobileMenu()">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-drawer" class="hidden lg:hidden border-t border-[#E8DFD3] bg-[#FAF7F2] px-4 pt-3 pb-6 space-y-2">
+      <a href="{{ url_for('index') }}#about" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '라엘리안 소개' if lang == 'ko' else 'About' }}</a>
+      <a href="{{ url_for('index') }}#philosophy" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '지적설계 & 철학' if lang == 'ko' else 'Philosophy' }}</a>
+      <a href="{{ url_for('index') }}#embassy" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '외계인 대사관' if lang == 'ko' else 'Embassy' }}</a>
+      <a href="{{ url_for('articles_list') }}" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '소식 & 아티클' if lang == 'ko' else 'News & Articles' }}</a>
+      <a href="{{ url_for('index') }}#books" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '도서 다운로드' if lang == 'ko' else 'eBooks' }}</a>
+      <a href="{{ url_for('index') }}#events" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '세미나 & 일정' if lang == 'ko' else 'Events' }}</a>
+      <a href="{{ url_for('index') }}#contact" class="block px-3 py-2 text-base font-medium text-[#4A4036] hover:bg-[#F2EAE0] rounded-lg">{{ '연락처' if lang == 'ko' else 'Contact' }}</a>
+    </div>
+  </header>
+
+  <!-- Flash Messages -->
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="max-w-4xl mx-auto px-4 mt-4 w-full">
+        {% for category, message in messages %}
+          <div class="p-3.5 mb-2 rounded-xl text-sm font-medium flex items-center gap-2 {% if category == 'error' %}bg-rose-100 text-rose-800 border border-rose-200{% elif category == 'success' %}bg-emerald-100 text-emerald-800 border border-emerald-200{% else %}bg-amber-100 text-amber-800 border border-amber-200{% endif %}">
+            <i data-lucide="info" class="w-4 h-4 shrink-0"></i>
+            <span>{{ message }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Main Dynamic Content -->
+  <main class="flex-grow">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#1E1915] text-[#C8B8A6] border-t border-[#382F26] pt-16 pb-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-[#382F26]">
+        
+        <!-- Col 1: Brand & Embassy -->
+        <div class="md:col-span-2 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style="background-color: {{ site_data.theme.accentColor or '#EA580C' }};">
+              <svg viewBox="0 0 100 100" class="w-6 h-6 fill-none stroke-white stroke-[7]">
+                <circle cx="50" cy="50" r="42" class="opacity-30" />
+                <path d="M50,16 A34,34 0 0,1 84,50 A34,34 0 0,1 50,84 A18,18 0 0,1 32,66 A18,18 0 0,1 50,48" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-white font-bold font-display text-lg tracking-tight flex items-center gap-2">
+                <span>{{ '부탄 라엘리안 무브먼트' if lang == 'ko' else 'Bhutan Raëlian Movement' }}</span>
+                <span class="text-xs font-normal text-[#A69584] font-dzongkha">འབྲུག་ཡུལ།</span>
+              </h3>
+              <p class="text-xs text-[#8F7E70]">KINGDOM OF BHUTAN • ELOHIM EMBASSY</p>
+            </div>
+          </div>
+          <p class="text-sm text-[#A69584] leading-relaxed max-w-lg">
+            {{ '인류의 기원과 지적설계, 그리고 우주인 창조자 엘로힘을 맞이할 공식 외계인 대사관을 준비하는 비영리 평화 단체입니다. 부탄 왕국의 국민총행복(GNH) 정신과 조화를 이루어 평화와 번영을 구현합니다.' if lang == 'ko' else 'A non-profit movement dedicated to preparing the Extraterrestrial Embassy for the Elohim, creators of humanity through intelligent design. In harmony with the Gross National Happiness of Bhutan.' }}
+          </p>
+          <div class="flex items-center gap-4 text-xs text-[#A69584]">
+            <a href="mailto:{{ site_data.seo.socialLinks.email }}" class="flex items-center gap-1 hover:text-white transition-colors">
+              <i data-lucide="mail" class="w-4 h-4"></i>
+              <span>{{ site_data.seo.socialLinks.email }}</span>
+            </a>
+            <span>•</span>
+            <a href="https://www.rael.org" target="_blank" class="hover:text-white transition-colors">
+              www.rael.org
+            </a>
+          </div>
+        </div>
+
+        <!-- Col 2: Quick Links -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">{{ '사이트 바로가기' if lang == 'ko' else 'Quick Links' }}</h4>
+          <ul class="space-y-2 text-xs">
+            <li><a href="{{ url_for('index') }}#about" class="hover:text-white transition-colors">{{ '라엘리안 소개' if lang == 'ko' else 'About Elohim' }}</a></li>
+            <li><a href="{{ url_for('index') }}#philosophy" class="hover:text-white transition-colors">{{ '지적설계 철학' if lang == 'ko' else 'Intelligent Design' }}</a></li>
+            <li><a href="{{ url_for('index') }}#embassy" class="hover:text-white transition-colors">{{ '외계인 대사관' if lang == 'ko' else 'Embassy Project' }}</a></li>
+            <li><a href="{{ url_for('articles_list') }}" class="hover:text-white transition-colors">{{ '최신 아티클' if lang == 'ko' else 'News & Articles' }}</a></li>
+            <li><a href="{{ url_for('index') }}#books" class="hover:text-white transition-colors">{{ '도서 무료 다운로드' if lang == 'ko' else 'Free eBooks' }}</a></li>
+            <li><a href="{{ url_for('index') }}#events" class="hover:text-white transition-colors">{{ '세미나 & 워크숍' if lang == 'ko' else 'Events' }}</a></li>
+          </ul>
+        </div>
+
+        <!-- Col 3: Official Links -->
+        <div>
+          <h4 class="text-white font-semibold text-sm mb-4">{{ '공식 연계 & 정보' if lang == 'ko' else 'Official Links' }}</h4>
+          <ul class="space-y-2 text-xs">
+            {% if session.get('admin_logged_in') %}
+              <li><a href="{{ url_for('admin_dashboard') }}" class="hover:text-white transition-colors text-amber-300">{{ '관리자 콘솔 접속' if lang == 'ko' else 'Admin Control Center' }}</a></li>
+            {% endif %}
+            <li><a href="https://elohimembassy.org" target="_blank" class="hover:text-white transition-colors">Elohim Embassy Global</a></li>
+            <li><a href="https://www.rael.org" target="_blank" class="hover:text-white transition-colors">International Raëlian Movement</a></li>
+            <li><a href="https://proswastika.org" target="_blank" class="hover:text-white transition-colors">ProSwastika Peace Alliance</a></li>
+            <li><a href="{{ url_for('index') }}#contact" class="hover:text-white transition-colors">{{ '부탄 지부 문의' if lang == 'ko' else 'Contact Bhutan Chapter' }}</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#7A6B5D] gap-4">
+        <p>&copy; 2026 Bhutan Raëlian Movement. All rights reserved.</p>
+        <p class="text-center sm:text-right">
+          {{ '부탄 왕국 내 엘로힘 대사관 유치 비전 추진 위원회' if lang == 'ko' else 'Advancing the Elohim Extraterrestrial Embassy in the Kingdom of Bhutan' }}
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    function toggleMobileMenu() {
+      const drawer = document.getElementById('mobile-drawer');
+      if (drawer) {
+        drawer.classList.toggle('hidden');
+      }
+    }
+  </script>
+</body>
+</html>

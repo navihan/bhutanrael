@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+<article class="py-16 bg-[#FAF7F2] min-h-[85vh]">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Top Return Bar -->
+    <div class="mb-8 flex items-center justify-between">
+      <a href="{{ url_for('articles_list') }}" class="inline-flex items-center gap-2 text-xs font-semibold text-[#6A5A4A] hover:text-[#EA580C] bg-white px-3.5 py-2 rounded-xl border border-[#DDD0C0] shadow-2xs">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        <span>{{ '아티클 목록으로 돌아가기' if lang == 'ko' else 'Back to Articles' }}</span>
+      </a>
+
+      {% if session.get('admin_logged_in') %}
+      <div class="flex items-center gap-2">
+        <span class="text-xs bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-md font-semibold">{{ '관리자 권한' if lang == 'ko' else 'Admin Mode' }}</span>
+        <a href="{{ url_for('admin_dashboard') }}" class="text-xs text-[#EA580C] underline font-semibold">{{ '대시보드에서 수정하기' if lang == 'ko' else 'Edit in Dashboard' }}</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Article Header -->
+    <header class="space-y-4 mb-8">
+      <div class="flex items-center gap-2.5">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-[#EA580C]/15 text-[#C2410C]">
+          {{ post.category }}
+        </span>
+        <span class="text-xs text-[#8C7A68]">{{ post.date }}</span>
+        <span class="text-xs text-[#8C7A68]">•</span>
+        <span class="text-xs text-[#8C7A68]">{{ post.readTime }}</span>
+        <span class="text-xs text-[#8C7A68]">•</span>
+        <span class="text-xs text-[#8C7A68]"><i data-lucide="eye" class="w-3 h-3 inline"></i> {{ post.views or 1 }}</span>
+      </div>
+
+      <h1 class="text-2xl sm:text-4xl font-bold font-display text-[#1F1B18] leading-tight">
+        {{ post.title[lang] }}
+      </h1>
+
+      <p class="text-sm sm:text-base text-[#6A5A4A] font-medium leading-relaxed bg-[#F3ECE4] p-4 rounded-xl border-l-4 border-[#EA580C]">
+        {{ post.summary[lang] }}
+      </p>
+
+      <div class="flex items-center gap-2 text-xs text-[#7A6B5D] pt-2">
+        <i data-lucide="user" class="w-4 h-4 text-[#EA580C]"></i>
+        <span class="font-semibold text-[#1F1B18]">{{ post.author }}</span>
+      </div>
+    </header>
+
+    <!-- Cover Image -->
+    {% if post.coverImage %}
+    <div class="rounded-3xl overflow-hidden shadow-lg border border-[#DDD0C0] mb-10 aspect-video">
+      <img src="{{ post.coverImage }}" alt="{{ post.title[lang] }}" class="w-full h-full object-cover">
+    </div>
+    {% endif %}
+
+    <!-- Article Body -->
+    <div class="bg-white rounded-3xl p-8 sm:p-12 border border-[#DDD0C0] shadow-sm space-y-6 text-sm sm:text-base text-[#3A3129] leading-loose whitespace-pre-line">
+      {{ post.content[lang] }}
+    </div>
+
+    <!-- Tags -->
+    {% if post.tags %}
+    <div class="mt-6 flex flex-wrap items-center gap-2">
+      <span class="text-xs font-semibold text-[#8C7A68]">{{ '태그:' if lang == 'ko' else 'Tags:' }}</span>
+      {% for tag in post.tags %}
+      <span class="px-3 py-1 bg-[#EFE8DC] text-[#4A4036] rounded-full text-xs font-medium">
+        #{{ tag }}
+      </span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Reader Comments Section -->
+    <section class="mt-14 pt-10 border-t border-[#DDD0C0] space-y-8">
+      <div class="flex items-center justify-between">
+        <h3 class="text-xl font-bold font-display text-[#1F1B18] flex items-center gap-2">
+          <i data-lucide="message-square" class="w-5 h-5 text-[#EA580C]"></i>
+          <span>{{ '독자 댓글' if lang == 'ko' else 'Reader Comments' }} ({{ post.comments|length if post.comments else 0 }})</span>
+        </h3>
+      </div>
+
+      <!-- Add Comment Form -->
+      <form action="{{ url_for('add_comment', post_id=post.id) }}" method="POST" class="bg-white p-6 rounded-2xl border border-[#DDD0C0] space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-[#3A3129] mb-1">{{ '작성자 이름' if lang == 'ko' else 'Your Name' }} *</label>
+            <input type="text" name="author" required placeholder="예: Karma Wangchuk" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs focus:ring-2 focus:ring-[#EA580C] focus:outline-hidden">
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-[#3A3129] mb-1">{{ '댓글 내용' if lang == 'ko' else 'Comment' }} *</label>
+          <textarea name="text" rows="3" required placeholder="{{ '자유로운 의견과 소감을 남겨주세요.' if lang == 'ko' else 'Share your thoughts...' }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs focus:ring-2 focus:ring-[#EA580C] focus:outline-hidden"></textarea>
+        </div>
+        <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#1F1B18] text-white hover:bg-[#3A3129] text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer">
+          <i data-lucide="send" class="w-3.5 h-3.5"></i>
+          <span>{{ '댓글 등록하기' if lang == 'ko' else 'Post Comment' }}</span>
+        </button>
+      </form>
+
+      <!-- Comments List -->
+      <div class="space-y-3">
+        {% if post.comments %}
+          {% for c in post.comments %}
+          <div class="p-4 rounded-xl bg-white border border-[#DDD0C0] space-y-1.5">
+            <div class="flex items-center justify-between text-xs">
+              <span class="font-bold text-[#1F1B18]">{{ c.author }}</span>
+              <span class="text-[#8C7A68]">{{ c.createdAt }}</span>
+            </div>
+            <p class="text-xs sm:text-sm text-[#4A4036] leading-relaxed">{{ c.text }}</p>
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-xs text-[#8C7A68] text-center py-6">{{ '첫 번째 댓글을 남겨보세요.' if lang == 'ko' else 'Be the first to comment.' }}</p>
+        {% endif %}
+      </div>
+
+    </section>
+
+  </div>
+</article>
+{% endblock %}

@@ -1,0 +1,1271 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="py-10 bg-[#F5EFEB] min-h-[90vh]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Admin Top Nav Card with Site Quick Links -->
+    <div class="bg-[#1E1915] text-white p-6 rounded-3xl shadow-xl mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6 border border-[#3D332B]">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+          <h1 class="text-xl font-bold font-display tracking-tight text-white">
+            {{ '부탄 라엘리안 무브먼트 관리자 콘솔' if lang == 'ko' else 'Bhutan RM Admin Management Console' }}
+          </h1>
+          <span class="text-xs bg-[#EA580C] px-2.5 py-0.5 rounded-full font-bold">LIVE</span>
+        </div>
+        <p class="text-xs text-[#A69584]">
+          접속 계정: <span class="text-amber-300 font-mono font-semibold">{{ session.get('admin_email', 'navihan01@gmail.com') }}</span> ({{ session.get('admin_name', '최고 관리자') }})
+        </p>
+      </div>
+
+      <!-- Quick Jump to Site Sections -->
+      <div class="flex flex-wrap items-center gap-2">
+        <div class="hidden xl:flex items-center gap-1 bg-[#2C241E] px-3 py-1.5 rounded-xl border border-[#3E342B] mr-2">
+          <span class="text-[11px] text-[#A69584] font-medium mr-1">{{ '사이트 바로가기:' if lang == 'ko' else 'Jump:' }}</span>
+          <a href="{{ url_for('index') }}#about" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '소개' if lang == 'ko' else 'About' }}</a>
+          <a href="{{ url_for('index') }}#philosophy" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '철학' if lang == 'ko' else 'Philosophy' }}</a>
+          <a href="{{ url_for('index') }}#embassy" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '대사관' if lang == 'ko' else 'Embassy' }}</a>
+          <a href="{{ url_for('index') }}#articles" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '소식' if lang == 'ko' else 'News' }}</a>
+          <a href="{{ url_for('index') }}#books" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '도서' if lang == 'ko' else 'Books' }}</a>
+          <a href="{{ url_for('index') }}#events" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '일정' if lang == 'ko' else 'Events' }}</a>
+          <a href="{{ url_for('index') }}#contact" class="px-2 py-0.5 text-xs text-[#E8DFD3] hover:text-[#EA580C]">{{ '연락처' if lang == 'ko' else 'Contact' }}</a>
+        </div>
+
+        <a href="{{ url_for('index') }}" class="px-4 py-2 rounded-xl bg-[#2C241E] hover:bg-[#3D332B] text-xs font-semibold text-[#E8DFD3] flex items-center gap-1.5 transition-colors">
+          <i data-lucide="eye" class="w-4 h-4 text-amber-300"></i>
+          <span>{{ '홈페이지 보기' if lang == 'ko' else 'View Site' }}</span>
+        </a>
+        <a href="{{ url_for('admin_logout') }}" class="px-4 py-2 rounded-xl bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 hover:text-white text-xs font-semibold border border-rose-500/30 flex items-center gap-1.5 transition-colors">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span>{{ '로그아웃' if lang == 'ko' else 'Logout' }}</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Dashboard Tabs -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left Sidebar Tabs -->
+      <div class="lg:col-span-3 space-y-2">
+        <div class="bg-white p-3 rounded-2xl border border-[#DDD0C0] shadow-xs space-y-1">
+          
+          <!-- Inquiries Tab (High priority) -->
+          <button onclick="switchTab('inquiries')" id="tab-btn-inquiries" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-2.5 bg-[#EA580C] text-white">
+            <i data-lucide="mail" class="w-4 h-4"></i>
+            <span>{{ '받은 문의함 (Inquiries)' if lang == 'ko' else 'Inbox / Inquiries' }}</span>
+            {% if unread_inquiries_count > 0 %}
+            <span class="ml-auto text-[10px] bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold animate-pulse">{{ unread_inquiries_count }}</span>
+            {% else %}
+            <span class="ml-auto text-[10px] bg-stone-200 text-stone-700 px-2 py-0.5 rounded-full font-bold">{{ site_data.inquiries|length }}</span>
+            {% endif %}
+          </button>
+
+          <!-- Admin Management Tab (User requested) -->
+          <button onclick="switchTab('admins')" id="tab-btn-admins" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>{{ '관리자 초대 및 팀 관리' if lang == 'ko' else 'Admin Team & Invites' }}</span>
+            <span class="ml-auto text-[10px] bg-orange-100 text-orange-800 px-2 py-0.5 rounded-full font-bold">{{ site_data.admins|length }}</span>
+          </button>
+
+          <!-- Main Content Tab -->
+          <button onclick="switchTab('content')" id="tab-btn-content" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="layout" class="w-4 h-4"></i>
+            <span>{{ '메인 텍스트 문구 관리' if lang == 'ko' else 'Main Text Content' }}</span>
+          </button>
+
+          <!-- Philosophy Pillars Board Tab -->
+          <button onclick="switchTab('philosophy')" id="tab-btn-philosophy" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="sparkles" class="w-4 h-4"></i>
+            <span>{{ '지적설계 4대 철학 기둥' if lang == 'ko' else 'Philosophy Pillars' }}</span>
+          </button>
+
+          <!-- Posts Tab -->
+          <button onclick="switchTab('posts')" id="tab-btn-posts" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>{{ '아티클 / 소식 게시판' if lang == 'ko' else 'Articles & Posts' }}</span>
+            <span class="ml-auto text-[10px] bg-stone-200 text-stone-700 px-2 py-0.5 rounded-full font-bold">{{ site_data.posts|length }}</span>
+          </button>
+
+          <!-- Events Tab -->
+          <button onclick="switchTab('events')" id="tab-btn-events" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="calendar" class="w-4 h-4"></i>
+            <span>{{ '세미나 & 워크숍 일정' if lang == 'ko' else 'Events' }}</span>
+            <span class="ml-auto text-[10px] bg-stone-200 text-stone-700 px-2 py-0.5 rounded-full font-bold">{{ site_data.events|length }}</span>
+          </button>
+
+          <!-- Books Tab -->
+          <button onclick="switchTab('books')" id="tab-btn-books" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>{{ '무료 도서 다운로드 관리' if lang == 'ko' else 'Books' }}</span>
+            <span class="ml-auto text-[10px] bg-stone-200 text-stone-700 px-2 py-0.5 rounded-full font-bold">{{ site_data.books|length }}</span>
+          </button>
+
+          <!-- FAQs Tab -->
+          <button onclick="switchTab('faqs')" id="tab-btn-faqs" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="help-circle" class="w-4 h-4"></i>
+            <span>{{ 'FAQ 자주 묻는 질문 관리' if lang == 'ko' else 'FAQ Board' }}</span>
+            <span class="ml-auto text-[10px] bg-stone-200 text-stone-700 px-2 py-0.5 rounded-full font-bold">{{ site_data.faqs|length }}</span>
+          </button>
+
+          <!-- Theme Tab -->
+          <button onclick="switchTab('theme')" id="tab-btn-theme" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="palette" class="w-4 h-4"></i>
+            <span>{{ '테마 및 공지 배너' if lang == 'ko' else 'Theme & Announcement' }}</span>
+          </button>
+
+          <!-- Security Tab -->
+          <button onclick="switchTab('security')" id="tab-btn-security" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="shield" class="w-4 h-4"></i>
+            <span>{{ '관리자 비밀번호 변경' if lang == 'ko' else 'Admin Password' }}</span>
+          </button>
+
+          <!-- Backup Tab -->
+          <button onclick="switchTab('backup')" id="tab-btn-backup" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
+            <i data-lucide="database" class="w-4 h-4"></i>
+            <span>{{ '데이터 백업 & JSON 내보내기' if lang == 'ko' else 'Data Backup' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Tab Panels Container -->
+      <div class="lg:col-span-9">
+        
+        <!-- Tab: Inquiries (Inbox) -->
+        <div id="tab-inquiries" class="tab-panel bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E8DFD3] pb-4 gap-4">
+            <div>
+              <h2 class="text-lg font-bold font-display text-[#1F1B18] flex items-center gap-2">
+                <span>{{ '받은 문의함 (Inquiries Inbox)' if lang == 'ko' else 'Inquiries Inbox' }}</span>
+                {% if unread_inquiries_count > 0 %}
+                <span class="text-xs bg-rose-500 text-white px-2.5 py-0.5 rounded-full font-bold">{{ unread_inquiries_count }}개 미답변</span>
+                {% endif %}
+              </h2>
+              <p class="text-xs text-[#7A6B5D]">{{ '방문자가 전송한 모든 문의가 안전하게 저장되며, navihan01@gmail.com으로 실시간 전송됩니다.' }}</p>
+            </div>
+            
+            <a href="https://mail.google.com/mail/u/0/#inbox" target="_blank" class="px-4 py-2 rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors self-start sm:self-auto">
+              <i data-lucide="external-link" class="w-4 h-4"></i>
+              <span>navihan01@gmail.com 열기</span>
+            </a>
+          </div>
+
+          <!-- Email Delivery Notice Alert -->
+          <div class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs flex items-start gap-3">
+            <i data-lucide="info" class="w-5 h-5 text-amber-600 shrink-0 mt-0.5"></i>
+            <div class="space-y-1">
+              <strong>문의 수신 보장 안내:</strong>
+              <p>문의폼에서 제출된 모든 데이터는 서버 데이터베이스(site_data.json)에 영구 저장되며, 아래 목록에서 원클릭으로 <span class="font-bold underline">Gmail 즉시 답장</span>이 가능합니다. 이메일 서버 환경에 구애받지 않고 모든 문의를 한 곳에서 누락 없이 확인하실 수 있습니다.</p>
+            </div>
+          </div>
+
+          <!-- Inquiries List -->
+          {% if site_data.inquiries and site_data.inquiries|length > 0 %}
+          <div class="space-y-4">
+            {% for inq in site_data.inquiries %}
+            <div class="p-6 rounded-2xl border transition-all {% if inq.status == 'unread' %}bg-orange-50/40 border-orange-200 shadow-2xs{% else %}bg-[#FAF7F2] border-[#E0D5C7]{% endif %} space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8DFD3] pb-3">
+                <div class="flex items-center gap-3">
+                  <span class="px-2.5 py-1 rounded-md text-[11px] font-bold {% if inq.status == 'unread' %}bg-rose-100 text-rose-800{% else %}bg-emerald-100 text-emerald-800{% endif %}">
+                    {{ '미답변 (접수됨)' if inq.status == 'unread' else '답변 완료' }}
+                  </span>
+                  <h3 class="font-bold text-base text-[#1F1B18] font-display">{{ inq.name }}</h3>
+                  <span class="text-xs text-[#8C7A68]">({{ inq.email }})</span>
+                </div>
+                <div class="text-xs text-[#8C7A68] flex items-center gap-2">
+                  <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                  <span>{{ inq.createdAt }}</span>
+                </div>
+              </div>
+
+              <!-- Message Details -->
+              <div class="space-y-2 text-xs text-[#3A3129]">
+                {% if inq.phone %}
+                <div class="flex items-center gap-2 text-[#7A6B5D]">
+                  <i data-lucide="phone" class="w-3.5 h-3.5 text-[#EA580C]"></i>
+                  <span>연락처: <strong class="text-[#1F1B18]">{{ inq.phone }}</strong></span>
+                </div>
+                {% endif %}
+                <div class="font-semibold text-sm text-[#1F1B18] pt-1">
+                  제목: {{ inq.subject }}
+                </div>
+                <div class="p-4 rounded-xl bg-white border border-[#E0D5C7] text-xs leading-relaxed whitespace-pre-wrap text-[#4A4036]">
+{{ inq.message }}
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="flex flex-wrap items-center justify-between gap-3 pt-2">
+                <div class="flex items-center gap-2">
+                  <!-- Gmail Reply Button -->
+                  <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ inq.email }}&su=Re: {{ inq.subject }}&body=안녕하세요, {{ inq.name }}님!%0A%0A부탄 라엘리안 무브먼트(navihan01@gmail.com)입니다.%0A문의주신 내용에 대해 안내드립니다.%0A%0A--- 원문 내용 ---%0A{{ inq.message | urlencode }}" target="_blank" class="px-4 py-2 rounded-xl bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    <span>Gmail로 답장하기</span>
+                  </a>
+
+                  <!-- Mailto Reply Button -->
+                  <a href="mailto:{{ inq.email }}?subject=Re: {{ inq.subject }}&body=안녕하세요, {{ inq.name }}님! 부탄 라엘리안 무브먼트입니다." class="px-3.5 py-2 rounded-xl border border-[#D5C7B5] bg-white text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-1.5">
+                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                    <span>기본 메일 앱</span>
+                  </a>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <!-- Status Toggle -->
+                  <form action="{{ url_for('admin_toggle_inquiry_status', inquiry_id=inq.id) }}" method="POST">
+                    <button type="submit" class="px-3 py-1.5 rounded-lg border border-[#D5C7B5] bg-white text-xs font-semibold text-[#5A4F44] hover:bg-[#F2EAE0] transition-colors cursor-pointer">
+                      {{ '답변완료로 표시' if inq.status == 'unread' else '미답변으로 되돌리기' }}
+                    </button>
+                  </form>
+
+                  <!-- Delete -->
+                  <form action="{{ url_for('admin_delete_inquiry', inquiry_id=inq.id) }}" method="POST" onsubmit="return confirm('이 문의 내역을 삭제하시겠습니까?');">
+                    <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer" title="삭제">
+                      <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-12 bg-[#FAF7F2] rounded-2xl border border-[#E0D5C7] space-y-3">
+            <i data-lucide="inbox" class="w-10 h-10 text-[#8C7A68] mx-auto"></i>
+            <h3 class="font-bold text-sm text-[#1F1B18]">아직 접수된 문의가 없습니다</h3>
+            <p class="text-xs text-[#8C7A68]">메인 홈페이지의 문의폼에서 방문자가 글을 남기면 이곳에 즉시 표시됩니다.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Tab: Admin Management (User Requested: List, Add/Invite, Edit, Delete) -->
+        <div id="tab-admins" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-[#E8DFD3] pb-4 gap-4">
+            <div>
+              <h2 class="text-lg font-bold font-display text-[#1F1B18] flex items-center gap-2">
+                <span>{{ '관리자 초대 및 팀 관리' if lang == 'ko' else 'Admin Team Management' }}</span>
+                <span class="text-xs bg-orange-100 text-orange-800 px-2.5 py-0.5 rounded-full font-bold">{{ site_data.admins|length }}명 등록됨</span>
+              </h2>
+              <p class="text-xs text-[#7A6B5D]">{{ '새 관리자를 추가/초대하고, 권한(슈퍼 관리자, 일반 관리자, 에디터)을 부여하거나 관리합니다.' }}</p>
+            </div>
+          </div>
+
+          <!-- Add / Invite New Admin Form -->
+          <div class="p-6 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C] flex items-center gap-1.5">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>새 관리자 추가 및 초대 (Add Administrator)</span>
+            </h3>
+            <form action="{{ url_for('admin_create_admin_user') }}" method="POST" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">이름 / 호칭 *</label>
+                  <input type="text" name="name" required placeholder="예: 홍길동 (팀푸 코디네이터)" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">이메일 주소 (로그인 ID) *</label>
+                  <input type="email" name="email" required placeholder="admin@example.com" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">관리자 권한 / 역할</label>
+                  <select name="role" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                    <option value="admin">일반 관리자 (Admin - 글 작성/수정/관리)</option>
+                    <option value="super_admin">최고 관리자 (Super Admin - 전권)</option>
+                    <option value="editor">콘텐츠 에디터 (Editor - 기사 발행만)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">초기 비밀번호</label>
+                  <input type="text" name="password" value="rael2026!" placeholder="초기 비밀번호" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+              <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C] transition-colors flex items-center gap-1.5">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>새 관리자 등록 완료</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Admins List Table -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-[#1F1B18] font-display">등록된 관리자 목록 (Admins List)</h3>
+            <div class="overflow-x-auto rounded-2xl border border-[#E0D5C7]">
+              <table class="w-full text-left text-xs text-[#3A3129]">
+                <thead class="bg-[#FAF7F2] text-[#7A6B5D] border-b border-[#E0D5C7] font-semibold">
+                  <tr>
+                    <th class="px-4 py-3">관리자 정보</th>
+                    <th class="px-4 py-3">이메일 (ID)</th>
+                    <th class="px-4 py-3">권한 역할</th>
+                    <th class="px-4 py-3">상태</th>
+                    <th class="px-4 py-3">최근 로그인</th>
+                    <th class="px-4 py-3 text-right">관리 작업</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#E0D5C7] bg-white">
+                  {% for adm in site_data.admins %}
+                  <tr class="hover:bg-[#FAF7F2]/60 transition-colors">
+                    <td class="px-4 py-3 font-semibold text-[#1F1B18] flex items-center gap-2">
+                      <div class="w-7 h-7 rounded-full bg-stone-200 flex items-center justify-center text-stone-700 font-bold text-xs">
+                        {{ adm.name[:1] }}
+                      </div>
+                      <span>{{ adm.name }}</span>
+                      {% if adm.email == 'navihan01@gmail.com' %}
+                      <span class="text-[10px] bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full font-bold">마스터</span>
+                      {% endif %}
+                    </td>
+                    <td class="px-4 py-3 font-mono text-[#5A4F44]">{{ adm.email }}</td>
+                    <td class="px-4 py-3">
+                      {% if adm.role == 'super_admin' %}
+                      <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800">최고 관리자</span>
+                      {% elif adm.role == 'editor' %}
+                      <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800">에디터</span>
+                      {% else %}
+                      <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">일반 관리자</span>
+                      {% endif %}
+                    </td>
+                    <td class="px-4 py-3">
+                      <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800">정상 활성</span>
+                    </td>
+                    <td class="px-4 py-3 text-[#8C7A68]">{{ adm.lastLoginAt or '-' }}</td>
+                    <td class="px-4 py-3 text-right space-x-1">
+                      <button onclick="openEditAdminModal('{{ adm.id }}', '{{ adm.name }}', '{{ adm.role }}', '{{ adm.status }}')" class="px-3 py-1.5 rounded-lg border border-[#D5C7B5] hover:bg-[#F2EAE0] text-[#4A4036] font-semibold text-xs transition-colors cursor-pointer">
+                        수정
+                      </button>
+                      {% if adm.email != 'navihan01@gmail.com' %}
+                      <form action="{{ url_for('admin_delete_admin_user', admin_id=adm.id) }}" method="POST" class="inline-block" onsubmit="return confirm('정말 이 관리자({{ adm.name }})를 삭제하시겠습니까?');">
+                        <button type="submit" class="px-3 py-1.5 rounded-lg text-rose-600 hover:bg-rose-50 font-semibold text-xs transition-colors cursor-pointer">
+                          삭제
+                        </button>
+                      </form>
+                      {% else %}
+                      <span class="text-[11px] text-[#A69584] px-2" title="최고 관리자는 보호됩니다">보호됨</span>
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Edit Admin Modal Component -->
+          <div id="edit-admin-modal" class="hidden fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+            <div class="bg-white max-w-md w-full rounded-3xl p-6 border border-[#DDD0C0] shadow-2xl space-y-4">
+              <div class="flex items-center justify-between border-b border-[#E8DFD3] pb-3">
+                <h3 class="font-bold text-base text-[#1F1B18] font-display">관리자 정보 수정</h3>
+                <button type="button" onclick="closeEditAdminModal()" class="p-1 rounded-lg text-[#8C7A68] hover:bg-stone-100">
+                  <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+              </div>
+
+              <form id="edit-admin-form" method="POST" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">이름</label>
+                  <input type="text" id="edit-admin-name" name="name" required class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">권한 역할</label>
+                  <select id="edit-admin-role" name="role" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                    <option value="admin">일반 관리자 (Admin)</option>
+                    <option value="super_admin">최고 관리자 (Super Admin)</option>
+                    <option value="editor">콘텐츠 에디터 (Editor)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">상태</label>
+                  <select id="edit-admin-status" name="status" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                    <option value="active">정상 활성 (Active)</option>
+                    <option value="inactive">비활성 (Suspended)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">비밀번호 재설정 (변경할 경우만 입력)</label>
+                  <input type="password" name="new_password" placeholder="새 비밀번호 입력" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+
+                <div class="flex items-center justify-end gap-2 pt-2">
+                  <button type="button" onclick="closeEditAdminModal()" class="px-4 py-2 rounded-xl border border-[#D5C7B5] text-xs text-[#5A4F44]">
+                    취소
+                  </button>
+                  <button type="submit" class="px-5 py-2 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C]">
+                    수정 저장
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 1: Content Editor (All Main Texts) -->
+        <div id="tab-content" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="flex items-center justify-between border-b border-[#E8DFD3] pb-4">
+            <div>
+              <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '메인 사이트 콘텐츠 실시간 편집' if lang == 'ko' else 'Edit Main Content' }}</h2>
+              <p class="text-xs text-[#7A6B5D]">{{ '히어로 배너, 라엘리안 소개, 대사관 프로젝트, 연락처 문구를 저장합니다.' if lang == 'ko' else 'Update copy for hero, about, embassy, and contact sections.' }}</p>
+            </div>
+          </div>
+
+          <form action="{{ url_for('admin_update_content') }}" method="POST" class="space-y-6">
+            <!-- Hero Title KO/EN -->
+            <div class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '1. 히어로 메인 섹션' if lang == 'ko' else '1. Hero Section' }}</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">상단 배지 (한국어)</label>
+                  <input type="text" name="hero_badge_ko" value="{{ site_data.content.hero.badge.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Top Badge (English)</label>
+                  <input type="text" name="hero_badge_en" value="{{ site_data.content.hero.badge.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">메인 타이틀 (한국어)</label>
+                  <input type="text" name="hero_title_ko" value="{{ site_data.content.hero.title.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Main Title (English)</label>
+                  <input type="text" name="hero_title_en" value="{{ site_data.content.hero.title.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">서브 설명 (한국어)</label>
+                  <textarea name="hero_sub_ko" rows="2" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">{{ site_data.content.hero.subtitle.ko }}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Subtitle (English)</label>
+                  <textarea name="hero_sub_en" rows="2" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">{{ site_data.content.hero.subtitle.en }}</textarea>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">버튼 1 문구 (한국어)</label>
+                  <input type="text" name="hero_cta1_ko" value="{{ site_data.content.hero.primaryCtaText.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Button 1 Text (English)</label>
+                  <input type="text" name="hero_cta1_en" value="{{ site_data.content.hero.primaryCtaText.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">버튼 2 문구 (한국어)</label>
+                  <input type="text" name="hero_cta2_ko" value="{{ site_data.content.hero.secondaryCtaText.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Button 2 Text (English)</label>
+                  <input type="text" name="hero_cta2_en" value="{{ site_data.content.hero.secondaryCtaText.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+
+              <!-- Hero Visual Image Direct Upload -->
+              <div class="pt-3 border-t border-[#E8DFD3]">
+                <label class="block text-xs font-bold text-[#3A3129] mb-1 flex items-center justify-between">
+                  <span>히어로 메인 비주얼 이미지 (파일 직접 업로드)</span>
+                  <span class="text-[11px] font-semibold text-[#EA580C] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">기기에서 파일 업로드</span>
+                </label>
+                <input type="hidden" name="hero_image" id="hero_image_val" value="{{ site_data.content.hero.heroImage }}">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-white border-2 border-dashed border-[#D5C7B5] hover:border-[#EA580C] transition-colors">
+                  <div class="w-28 h-20 rounded-xl overflow-hidden bg-stone-200 border border-[#DDD0C0] shrink-0">
+                    <img id="hero_image_preview" src="{{ site_data.content.hero.heroImage }}" alt="Hero Preview" class="w-full h-full object-cover">
+                  </div>
+                  <div class="space-y-1 flex-1">
+                    <p class="text-xs font-bold text-[#1F1B18]" id="hero_image_filename">등록된 히어로 메인 이미지</p>
+                    <p class="text-[11px] text-[#7A6B5D]">홈페이지 첫 화면 메인 카드에 노출되는 사진 파일(JPG, PNG, WEBP)을 업로드하세요.</p>
+                    <div class="flex items-center gap-2 pt-1">
+                      <label class="px-3 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-2xs">
+                        <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                        <span>새 이미지 파일 선택</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'hero_image_val', 'hero_image_preview', 'hero_image_filename')">
+                      </label>
+                      <button type="button" onclick="resetImageUpload('hero_image_val', 'hero_image_preview', 'hero_image_filename', 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1600&auto=format&fit=crop&q=80')" class="px-2.5 py-1.5 rounded-lg border border-[#DDD0C0] bg-white text-xs text-[#6B5E52] hover:bg-stone-50">
+                        기본값 복원
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- About Section -->
+            <div class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '2. 라엘리안 소개 섹션' if lang == 'ko' else '2. About Section' }}</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">소개 제목 (한국어)</label>
+                  <input type="text" name="about_title_ko" value="{{ site_data.content.about.title.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">About Title (English)</label>
+                  <input type="text" name="about_title_en" value="{{ site_data.content.about.title.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+              </div>
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">소개 본문 (한국어)</label>
+                  <textarea name="about_desc_ko" rows="4" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed">{{ site_data.content.about.description.ko }}</textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">About Description (English)</label>
+                  <textarea name="about_desc_en" rows="4" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed">{{ site_data.content.about.description.en }}</textarea>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">대표 명언 (한국어)</label>
+                  <input type="text" name="about_quote_ko" value="{{ site_data.content.about.quote.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">명언 저자</label>
+                  <input type="text" name="about_quote_author_ko" value="{{ site_data.content.about.quoteAuthor.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+
+              <!-- About Visual Image Direct Upload -->
+              <div class="pt-3 border-t border-[#E8DFD3]">
+                <label class="block text-xs font-bold text-[#3A3129] mb-1 flex items-center justify-between">
+                  <span>무브먼트 소개 대표 사진 (파일 직접 업로드)</span>
+                  <span class="text-[11px] font-semibold text-[#EA580C] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">기기에서 파일 업로드</span>
+                </label>
+                <input type="hidden" name="about_image" id="about_image_val" value="{{ site_data.content.about.aboutImage }}">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-white border-2 border-dashed border-[#D5C7B5] hover:border-[#EA580C] transition-colors">
+                  <div class="w-28 h-20 rounded-xl overflow-hidden bg-stone-200 border border-[#DDD0C0] shrink-0">
+                    <img id="about_image_preview" src="{{ site_data.content.about.aboutImage }}" alt="About Preview" class="w-full h-full object-cover">
+                  </div>
+                  <div class="space-y-1 flex-1">
+                    <p class="text-xs font-bold text-[#1F1B18]" id="about_image_filename">등록된 소개 섹션 대표 사진</p>
+                    <p class="text-[11px] text-[#7A6B5D]">소개 섹션 좌측에 노출될 사진 파일(JPG, PNG, WEBP)을 업로드하세요.</p>
+                    <div class="flex items-center gap-2 pt-1">
+                      <label class="px-3 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-2xs">
+                        <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                        <span>새 이미지 파일 선택</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'about_image_val', 'about_image_preview', 'about_image_filename')">
+                      </label>
+                      <button type="button" onclick="resetImageUpload('about_image_val', 'about_image_preview', 'about_image_filename', 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=900&auto=format&fit=crop&q=80')" class="px-2.5 py-1.5 rounded-lg border border-[#DDD0C0] bg-white text-xs text-[#6B5E52] hover:bg-stone-50">
+                        기본값 복원
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Embassy Section -->
+            <div class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '3. 외계인 대사관 프로젝트 섹션' if lang == 'ko' else '3. Embassy Project' }}</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">대사관 제목 (한국어)</label>
+                  <input type="text" name="embassy_title_ko" value="{{ site_data.content.embassy.title.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Embassy Title (English)</label>
+                  <input type="text" name="embassy_title_en" value="{{ site_data.content.embassy.title.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">대사관 프로젝트 상세 설명 (한국어)</label>
+                <textarea name="embassy_desc_ko" rows="3" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">{{ site_data.content.embassy.description.ko }}</textarea>
+              </div>
+
+              <!-- Embassy Visual Image Direct Upload -->
+              <div class="pt-3 border-t border-[#E8DFD3]">
+                <label class="block text-xs font-bold text-[#3A3129] mb-1 flex items-center justify-between">
+                  <span>외계인 대사관 조감도/건축 모델 이미지 (파일 직접 업로드)</span>
+                  <span class="text-[11px] font-semibold text-[#EA580C] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">기기에서 파일 업로드</span>
+                </label>
+                <input type="hidden" name="embassy_image" id="embassy_image_val" value="{{ site_data.content.embassy.embassyImage }}">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-white border-2 border-dashed border-[#D5C7B5] hover:border-[#EA580C] transition-colors">
+                  <div class="w-28 h-20 rounded-xl overflow-hidden bg-stone-200 border border-[#DDD0C0] shrink-0">
+                    <img id="embassy_image_preview" src="{{ site_data.content.embassy.embassyImage }}" alt="Embassy Preview" class="w-full h-full object-cover">
+                  </div>
+                  <div class="space-y-1 flex-1">
+                    <p class="text-xs font-bold text-[#1F1B18]" id="embassy_image_filename">등록된 대사관 조감도 이미지</p>
+                    <p class="text-[11px] text-[#7A6B5D]">엘로힘 대사관 프로젝트 섹션에 노출될 조감도/모델 사진을 업로드하세요.</p>
+                    <div class="flex items-center gap-2 pt-1">
+                      <label class="px-3 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-2xs">
+                        <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                        <span>새 이미지 파일 선택</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'embassy_image_val', 'embassy_image_preview', 'embassy_image_filename')">
+                      </label>
+                      <button type="button" onclick="resetImageUpload('embassy_image_val', 'embassy_image_preview', 'embassy_image_filename', 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80')" class="px-2.5 py-1.5 rounded-lg border border-[#DDD0C0] bg-white text-xs text-[#6B5E52] hover:bg-stone-50">
+                        기본값 복원
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '4. 공식 연락처 & 문의처 정보' if lang == 'ko' else '4. Contact Details' }}</h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">대표 이메일 (문의 수신처)</label>
+                  <input type="email" name="contact_email" value="{{ site_data.content.contact.email or 'navihan01@gmail.com' }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-mono font-bold text-[#EA580C]">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">대표 연락처 (전화번호)</label>
+                  <input type="text" name="contact_phone" value="{{ site_data.content.contact.phone }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-mono">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">사무소 주소 (한국어)</label>
+                  <input type="text" name="contact_address_ko" value="{{ site_data.content.contact.address.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Office Address (English)</label>
+                  <input type="text" name="contact_address_en" value="{{ site_data.content.contact.address.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div class="sm:col-span-2">
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">방문/모임 가능 시간 (한국어)</label>
+                  <input type="text" name="contact_hours_ko" value="{{ site_data.content.contact.meetingHours.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+            </div>
+
+            <button type="submit" class="px-6 py-3 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C] transition-colors shadow-sm">
+              {{ '메인 콘텐츠 실시간 저장' if lang == 'ko' else 'Save Main Content' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab: Philosophy 4 Pillars Board -->
+        <div id="tab-philosophy" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="border-b border-[#E8DFD3] pb-4">
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '지적설계 4대 철학 기둥 관리 (Philosophy Pillars)' if lang == 'ko' else 'Philosophy Pillars Board' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '메인 페이지의 4대 핵심 철학 카드(지적설계, 대사관, 감각명상, 무한성)의 타이틀과 설명 목록을 편집합니다.' }}</p>
+          </div>
+
+          <form action="{{ url_for('admin_update_philosophy') }}" method="POST" class="space-y-6">
+            {% for pillar in site_data.philosophyPillars %}
+            <div class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+              <div class="flex items-center gap-2 border-b border-[#E8DFD3] pb-2">
+                <span class="w-6 h-6 rounded-full bg-[#EA580C] text-white text-xs font-bold flex items-center justify-center">{{ loop.index }}</span>
+                <h3 class="font-bold text-sm text-[#1F1B18] font-display">{{ pillar.title.ko }}</h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">기둥 제목 (한국어) *</label>
+                  <input type="text" name="pillar_{{ pillar.id }}_title_ko" value="{{ pillar.title.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Title (English) *</label>
+                  <input type="text" name="pillar_{{ pillar.id }}_title_en" value="{{ pillar.title.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">핵심 슬로건 (한국어)</label>
+                  <input type="text" name="pillar_{{ pillar.id }}_tagline_ko" value="{{ pillar.tagline.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Tagline (English)</label>
+                  <input type="text" name="pillar_{{ pillar.id }}_tagline_en" value="{{ pillar.tagline.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">세부 핵심 포인트 목록 (한국어 - 줄바꿈으로 구분)</label>
+                <textarea name="pillar_{{ pillar.id }}_points_ko" rows="4" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed font-sans">{% for pt in pillar.points.ko %}{{ pt }}
+{% endfor %}</textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">Key Bullet Points (English - Line separated)</label>
+                <textarea name="pillar_{{ pillar.id }}_points_en" rows="4" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed font-sans">{% for pt in pillar.points.en %}{{ pt }}
+{% endfor %}</textarea>
+              </div>
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="px-6 py-3 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C] transition-colors shadow-sm">
+              {{ '4대 철학 기둥 수정사항 저장' if lang == 'ko' else 'Save Philosophy Pillars' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 2: Articles Manager -->
+        <div id="tab-posts" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="flex items-center justify-between border-b border-[#E8DFD3] pb-4">
+            <div>
+              <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '아티클 및 뉴스 게시판 관리' if lang == 'ko' else 'Articles & Insights' }}</h2>
+              <p class="text-xs text-[#7A6B5D]">{{ '부탄 소식, 칼럼, 감각명상 가이드 글을 신규 작성하거나 삭제합니다.' }}</p>
+            </div>
+            <button onclick="toggleNewPostForm()" class="px-4 py-2 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C] transition-colors flex items-center gap-1.5 cursor-pointer">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>{{ '새 아티클 작성' if lang == 'ko' else 'New Article' }}</span>
+            </button>
+          </div>
+
+          <!-- New Article Form -->
+          <div id="new-post-box" class="hidden p-6 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '새 아티클 작성하기' if lang == 'ko' else 'Create New Article' }}</h3>
+            
+            <form action="{{ url_for('admin_create_post') }}" method="POST" class="space-y-4">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">제목 (한국어) *</label>
+                  <input type="text" name="title_ko" required placeholder="예: 팀푸 평화 워크숍 후기" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">Title (English) *</label>
+                  <input type="text" name="title_en" required placeholder="Ex: Thimphu Peace Workshop Review" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">카테고리</label>
+                  <select name="category" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                    <option value="announcement">공지 (announcement)</option>
+                    <option value="science">과학 (science)</option>
+                    <option value="meditation">명상 (meditation)</option>
+                    <option value="embassy">대사관 (embassy)</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#3A3129] mb-1">작성자</label>
+                  <input type="text" name="author" value="{{ session.get('admin_name', '부탄 지부 운영위원회') }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+                </div>
+              </div>
+
+              <!-- Post Cover Image Direct File Upload -->
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1 flex items-center justify-between">
+                  <span>게시글 대표 커버 이미지 (파일 직접 업로드)</span>
+                  <span class="text-[11px] font-semibold text-[#EA580C] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">기기에서 파일 업로드</span>
+                </label>
+                <input type="hidden" name="cover_image" id="post_cover_image_val" value="https://images.unsplash.com/photo-1544717305-2782549b5136?w=900&auto=format&fit=crop&q=80">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-white border-2 border-dashed border-[#D5C7B5] hover:border-[#EA580C] transition-colors">
+                  <div class="w-24 h-20 sm:w-28 sm:h-20 rounded-xl overflow-hidden bg-stone-200 border border-[#DDD0C0] shrink-0">
+                    <img id="post_cover_preview" src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=900&auto=format&fit=crop&q=80" alt="Cover Preview" class="w-full h-full object-cover">
+                  </div>
+                  <div class="space-y-1 flex-1">
+                    <p class="text-xs font-bold text-[#1F1B18]" id="post_cover_filename">현재 기본 커버 이미지 사용 중</p>
+                    <p class="text-[11px] text-[#7A6B5D]">JPG, PNG, WEBP, GIF 이미지 파일을 컴퓨터/기기에서 직접 선택하여 등록하세요.</p>
+                    <div class="flex items-center gap-2 pt-1">
+                      <label class="px-3 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-2xs">
+                        <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                        <span>이미지 파일 선택</span>
+                        <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'post_cover_image_val', 'post_cover_preview', 'post_cover_filename')">
+                      </label>
+                      <button type="button" onclick="resetImageUpload('post_cover_image_val', 'post_cover_preview', 'post_cover_filename', 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=900&auto=format&fit=crop&q=80')" class="px-2.5 py-1.5 rounded-lg border border-[#DDD0C0] bg-white text-xs text-[#6B5E52] hover:bg-stone-50">
+                        기본값 복원
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">요약 설명 (한국어) *</label>
+                <textarea name="summary_ko" rows="2" required placeholder="아티클 요약 2~3줄" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">본문 내용 (한국어) *</label>
+                <textarea name="content_ko" rows="6" required placeholder="아티클 본문 내용..." class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed"></textarea>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C] transition-colors">
+                  {{ '아티클 즉시 발행' if lang == 'ko' else 'Publish Article' }}
+                </button>
+                <button type="button" onclick="toggleNewPostForm()" class="px-4 py-2.5 rounded-xl border border-[#D5C7B5] text-xs text-[#5A4F44]">
+                  {{ '취소' if lang == 'ko' else 'Cancel' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Existing Posts List -->
+          <div class="space-y-3">
+            {% for post in site_data.posts %}
+            <div class="p-4 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] flex items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <img src="{{ post.coverImage }}" alt="{{ post.title.ko }}" class="w-16 h-12 rounded-lg object-cover">
+                <div>
+                  <span class="text-[10px] uppercase tracking-wider font-bold text-[#EA580C]">{{ post.category }}</span>
+                  <h4 class="font-bold text-sm text-[#1F1B18] font-display">{{ post.title.ko }}</h4>
+                  <p class="text-xs text-[#8C7A68]">{{ post.date }} • {{ post.author }} • {{ post.views or 0 }} views</p>
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <a href="{{ url_for('article_detail', post_id=post.id) }}" target="_blank" class="p-2 rounded-lg text-[#5A4F44] hover:text-[#EA580C] hover:bg-white transition-colors" title="미리보기">
+                  <i data-lucide="external-link" class="w-4 h-4"></i>
+                </a>
+                <form action="{{ url_for('admin_delete_post', post_id=post.id) }}" method="POST" onsubmit="return confirm('정말 이 아티클을 삭제하시겠습니까?');">
+                  <button type="submit" class="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer" title="삭제">
+                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Tab 3: Events Manager -->
+        <div id="tab-events" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="border-b border-[#E8DFD3] pb-4">
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '평화 명상 워크숍 & 세미나 일정' if lang == 'ko' else 'Events Management' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '부탄 온/오프라인 세미나 일정을 관리합니다.' }}</p>
+          </div>
+
+          <!-- Add Event Form -->
+          <form action="{{ url_for('admin_create_event') }}" method="POST" class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '새 행사 일정 등록' if lang == 'ko' else 'Add Event' }}</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">행사명 (한국어) *</label>
+                <input type="text" name="title_ko" required placeholder="예: 팀푸 감각명상 데이" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">장소 *</label>
+                <input type="text" name="location_ko" required placeholder="예: 팀푸 평화홀" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">일자 (YYYY-MM-DD)</label>
+                <input type="date" name="date" required value="2026-05-15" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">시간</label>
+                <input type="text" name="time" value="14:00 - 17:00 (GMT+6)" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="flex items-center gap-2 mt-4 cursor-pointer">
+                  <input type="checkbox" name="is_online" class="w-4 h-4 rounded text-[#EA580C]">
+                  <span class="text-xs font-bold text-[#1F1B18]">온라인 줌(Zoom) 세미나</span>
+                </label>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">줌(Zoom) 회의 링크 (선택)</label>
+                <input type="url" name="meeting_link" placeholder="https://zoom.us/..." class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">설명</label>
+              <textarea name="description_ko" rows="2" placeholder="행사 세부 내용..." class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs"></textarea>
+            </div>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C]">
+              {{ '행사 등록' if lang == 'ko' else 'Add Event' }}
+            </button>
+          </form>
+
+          <!-- Events List -->
+          <div class="space-y-3">
+            {% for evt in site_data.events %}
+            <div class="p-4 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-orange-100 text-orange-800">{{ evt.date }}</span>
+                <h4 class="font-bold text-sm text-[#1F1B18] mt-1">{{ evt.title.ko }}</h4>
+                <p class="text-xs text-[#8C7A68]">{{ evt.location.ko }} • {{ evt.time }}</p>
+              </div>
+              <form action="{{ url_for('admin_delete_event', event_id=evt.id) }}" method="POST" onsubmit="return confirm('일정을 삭제하시겠습니까?');">
+                <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Tab 4: Books Manager -->
+        <div id="tab-books" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="flex items-center justify-between border-b border-[#E8DFD3] pb-4">
+            <div>
+              <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '라엘리안 무료 도서 관리' if lang == 'ko' else 'Manage Books' }}</h2>
+              <p class="text-xs text-[#7A6B5D]">{{ '도서 소개글, 표지 이미지 및 PDF 무료 다운로드 URL을 관리합니다.' }}</p>
+            </div>
+          </div>
+
+          <!-- Add Book Form -->
+          <form action="{{ url_for('admin_create_book') }}" method="POST" class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '새 도서 등록 (Add eBook)' if lang == 'ko' else 'Add Book' }}</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">도서명 (한국어) *</label>
+                <input type="text" name="title_ko" required placeholder="예: 지적설계: 우주인의 메시지" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">Book Title (English)</label>
+                <input type="text" name="title_en" placeholder="Ex: Intelligent Design" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">저자</label>
+                <input type="text" name="author" value="마이트레야 라엘 (Maitreya Raël)" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">페이지 수</label>
+                <input type="number" name="page_count" value="280" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">다운로드 PDF URL</label>
+                <input type="url" name="download_url" value="https://www.rael.org/books/" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-mono">
+              </div>
+            </div>
+
+            <!-- Book Cover Image Direct File Upload -->
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1 flex items-center justify-between">
+                <span>도서 표지 이미지 (파일 직접 업로드)</span>
+                <span class="text-[11px] font-semibold text-[#EA580C] bg-orange-50 px-2 py-0.5 rounded border border-orange-200">기기에서 파일 업로드</span>
+              </label>
+              <input type="hidden" name="cover_image" id="book_cover_image_val" value="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-2xl bg-white border-2 border-dashed border-[#D5C7B5] hover:border-[#EA580C] transition-colors">
+                <div class="w-16 h-22 rounded-lg overflow-hidden bg-stone-200 border border-[#DDD0C0] shrink-0 shadow-xs">
+                  <img id="book_cover_preview" src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80" alt="Book Preview" class="w-full h-full object-cover">
+                </div>
+                <div class="space-y-1 flex-1">
+                  <p class="text-xs font-bold text-[#1F1B18]" id="book_cover_filename">현재 기본 표지 이미지</p>
+                  <p class="text-[11px] text-[#7A6B5D]">도서 표지 사진 파일(JPG, PNG, WEBP)을 컴퓨터/기기에서 선택하여 등록하세요.</p>
+                  <div class="flex items-center gap-2 pt-1">
+                    <label class="px-3 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white text-xs font-bold cursor-pointer transition-colors inline-flex items-center gap-1.5 shadow-2xs">
+                      <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                      <span>표지 이미지 파일 선택</span>
+                      <input type="file" accept="image/*" class="hidden" onchange="handleFileUpload(this, 'book_cover_image_val', 'book_cover_preview', 'book_cover_filename')">
+                    </label>
+                    <button type="button" onclick="resetImageUpload('book_cover_image_val', 'book_cover_preview', 'book_cover_filename', 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80')" class="px-2.5 py-1.5 rounded-lg border border-[#DDD0C0] bg-white text-xs text-[#6B5E52] hover:bg-stone-50">
+                      기본값 복원
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">도서 요약 설명</label>
+              <textarea name="desc_ko" rows="2" placeholder="도서 내용 간단 요약..." class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs"></textarea>
+            </div>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C]">
+              새 도서 등록
+            </button>
+          </form>
+
+          <div class="space-y-4">
+            {% for book in site_data.books %}
+            <div class="p-4 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] flex items-center justify-between gap-4">
+              <div class="flex items-center gap-4">
+                <img src="{{ book.coverImage }}" alt="{{ book.title.ko }}" class="w-12 h-16 rounded object-cover shadow-xs">
+                <div>
+                  <h4 class="font-bold text-sm text-[#1F1B18]">{{ book.title.ko }}</h4>
+                  <p class="text-xs text-[#8C7A68]">{{ book.author }} • {{ book.pageCount }}쪽</p>
+                  <a href="{{ book.downloadUrl }}" target="_blank" class="text-xs text-[#EA580C] underline font-mono">{{ book.downloadUrl }}</a>
+                </div>
+              </div>
+              <form action="{{ url_for('admin_delete_book', book_id=book.id) }}" method="POST" onsubmit="return confirm('이 도서를 삭제하시겠습니까?');">
+                <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Tab: FAQ Board -->
+        <div id="tab-faqs" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="border-b border-[#E8DFD3] pb-4">
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ 'FAQ 자주 묻는 질문 관리 (FAQs)' if lang == 'ko' else 'FAQ Management' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '메인 페이지 FAQ 섹션에 노출되는 질문과 답변을 추가하거나 삭제합니다.' }}</p>
+          </div>
+
+          <!-- Add FAQ Form -->
+          <form action="{{ url_for('admin_create_faq') }}" method="POST" class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-4">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">{{ '새 FAQ 등록' if lang == 'ko' else 'Add FAQ' }}</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">질문 (한국어) *</label>
+                <input type="text" name="q_ko" required placeholder="예: 라엘리안 무브먼트는 종교인가요?" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">Question (English)</label>
+                <input type="text" name="q_en" placeholder="Ex: Is the Raëlian Movement a religion?" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs font-bold">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">답변 (한국어) *</label>
+              <textarea name="a_ko" rows="3" required placeholder="답변 내용을 작성해 주세요..." class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed"></textarea>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">Answer (English)</label>
+              <textarea name="a_en" rows="3" placeholder="Answer in English..." class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs leading-relaxed"></textarea>
+            </div>
+            <button type="submit" class="px-4 py-2 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C]">
+              새 FAQ 등록
+            </button>
+          </form>
+
+          <!-- Existing FAQs List -->
+          <div class="space-y-3">
+            {% for faq in site_data.faqs %}
+            <div class="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E0D5C7] space-y-2 flex items-start justify-between gap-4">
+              <div class="space-y-1.5 flex-grow">
+                <h4 class="font-bold text-sm text-[#1F1B18] font-display flex items-center gap-2">
+                  <span class="text-[#EA580C]">Q{{ loop.index }}.</span>
+                  <span>{{ faq.q.ko }}</span>
+                </h4>
+                <p class="text-xs text-[#5A4F44] leading-relaxed pl-6">{{ faq.a.ko }}</p>
+              </div>
+              <form action="{{ url_for('admin_delete_faq', faq_idx=loop.index0) }}" method="POST" onsubmit="return confirm('이 FAQ를 삭제하시겠습니까?');">
+                <button type="submit" class="p-2 text-rose-500 hover:bg-rose-50 rounded-lg cursor-pointer shrink-0">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </form>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <!-- Tab 5: Theme & Appearance -->
+        <div id="tab-theme" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="border-b border-[#E8DFD3] pb-4">
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '테마 및 공지 배너 제어' if lang == 'ko' else 'Theme & Banner' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '사이트 대표 색상 및 최상단 공지 알림 문구를 설정합니다.' }}</p>
+          </div>
+
+          <form action="{{ url_for('admin_update_theme') }}" method="POST" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">포인트 강조 색상 (Accent Color)</label>
+                <div class="flex items-center gap-2">
+                  <input type="color" name="accent_color" value="{{ site_data.theme.accentColor or '#EA580C' }}" class="w-10 h-10 rounded-lg cursor-pointer border border-[#D5C7B5]">
+                  <input type="text" name="accent_color_text" value="{{ site_data.theme.accentColor or '#EA580C' }}" class="px-3 py-2 rounded-xl border border-[#D5C7B5] text-xs font-mono">
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold text-[#3A3129] mb-1">최상단 공지 배너 노출 여부</label>
+                <label class="flex items-center gap-2 mt-2 cursor-pointer">
+                  <input type="checkbox" name="show_announcement" {% if site_data.theme.showAnnouncement %}checked{% endif %} class="w-4 h-4 rounded text-[#EA580C]">
+                  <span class="text-xs font-semibold text-[#1F1B18]">배너 표시하기</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">공지 알림 문구 (한국어)</label>
+              <input type="text" name="announcement_text_ko" value="{{ site_data.theme.announcementText.ko }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">Announcement Text (English)</label>
+              <input type="text" name="announcement_text_en" value="{{ site_data.theme.announcementText.en }}" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs">
+            </div>
+
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C]">
+              {{ '테마 설정 저장' if lang == 'ko' else 'Save Theme' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 6: Security & Password -->
+        <div id="tab-security" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="border-b border-[#E8DFD3] pb-4">
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '관리자 비밀번호 변경' if lang == 'ko' else 'Security & Password' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '현재 접속 계정의 비밀번호를 안전하게 변경합니다.' }}</p>
+          </div>
+
+          <form action="{{ url_for('admin_change_password') }}" method="POST" class="max-w-md space-y-4">
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">현재 로그인 계정</label>
+              <input type="text" disabled value="{{ session.get('admin_email', 'navihan01@gmail.com') }}" class="w-full px-3.5 py-2 rounded-xl bg-stone-100 border border-[#D5C7B5] text-xs text-[#7A6B5D] font-mono font-bold">
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-[#3A3129] mb-1">새 비밀번호 입력 *</label>
+              <input type="password" name="new_password" required placeholder="최소 4자리 이상" class="w-full px-3.5 py-2 rounded-xl border border-[#D5C7B5] text-xs focus:ring-2 focus:ring-[#EA580C]">
+            </div>
+
+            <button type="submit" class="px-5 py-2.5 rounded-xl bg-[#1F1B18] text-white text-xs font-bold hover:bg-[#3D332B] transition-colors">
+              {{ '비밀번호 즉시 변경' if lang == 'ko' else 'Update Password' }}
+            </button>
+          </form>
+        </div>
+
+        <!-- Tab 7: Backup -->
+        <div id="tab-backup" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
+          <div class="border-b border-[#E8DFD3] pb-4">
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '데이터 내보내기 및 백업' if lang == 'ko' else 'Backup & Export' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '현재 사이트의 모든 데이터(JSON)를 원클릭으로 다운로드하여 백업합니다.' }}</p>
+          </div>
+
+          <div class="flex flex-wrap gap-4">
+            <a href="{{ url_for('admin_export_json') }}" class="px-5 py-3 rounded-xl bg-[#1F1B18] text-white text-xs font-bold hover:bg-[#3D332B] flex items-center gap-2">
+              <i data-lucide="download" class="w-4 h-4"></i>
+              <span>{{ 'site_data.json 백업 파일 다운로드' if lang == 'ko' else 'Download site_data.json' }}</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const tabIds = ['inquiries', 'admins', 'content', 'philosophy', 'posts', 'events', 'books', 'faqs', 'theme', 'security', 'backup'];
+
+  function switchTab(tabId) {
+    // hide all tab panels
+    document.querySelectorAll('.tab-panel').forEach(el => el.classList.add('hidden'));
+    
+    // show target
+    const target = document.getElementById('tab-' + tabId);
+    if (target) {
+      target.classList.remove('hidden');
+    }
+
+    // reset all buttons
+    tabIds.forEach(id => {
+      const btn = document.getElementById('tab-btn-' + id);
+      if (btn) {
+        btn.classList.remove('bg-[#EA580C]', 'text-white');
+        btn.classList.add('text-[#4A4036]');
+      }
+    });
+
+    const activeBtn = document.getElementById('tab-btn-' + tabId);
+    if (activeBtn) {
+      activeBtn.classList.add('bg-[#EA580C]', 'text-white');
+      activeBtn.classList.remove('text-[#4A4036]');
+    }
+
+    if (window.history && window.history.replaceState) {
+      window.history.replaceState(null, null, '#tab-' + tabId);
+    }
+
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+
+  function toggleNewPostForm() {
+    const box = document.getElementById('new-post-box');
+    if (box) {
+      box.classList.toggle('hidden');
+    }
+  }
+
+  function openEditAdminModal(id, name, role, status) {
+    const modal = document.getElementById('edit-admin-modal');
+    const form = document.getElementById('edit-admin-form');
+    document.getElementById('edit-admin-name').value = name;
+    document.getElementById('edit-admin-role').value = role;
+    document.getElementById('edit-admin-status').value = status || 'active';
+    form.action = '/admin/admins/' + id + '/edit';
+    modal.classList.remove('hidden');
+    if (window.lucide) lucide.createIcons();
+  }
+
+  function closeEditAdminModal() {
+    const modal = document.getElementById('edit-admin-modal');
+    modal.classList.add('hidden');
+  }
+
+  // Client-side instant image processing and optimization for direct file upload
+  function handleFileUpload(fileInput, targetInputId, previewImgId, filenameElId) {
+    if (!fileInput.files || fileInput.files.length === 0) return;
+    const file = fileInput.files[0];
+    if (!file.type.startsWith('image/')) {
+      alert('이미지 파일(JPG, PNG, WEBP, GIF, SVG)만 업로드할 수 있습니다.');
+      return;
+    }
+
+    const filenameEl = document.getElementById(filenameElId);
+    if (filenameEl) {
+      filenameEl.textContent = '이미지 최적화 처리 중...';
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const maxWidth = 1600;
+        const maxHeight = 1200;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width / maxWidth > height / maxHeight) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          const rawUrl = reader.result;
+          const targetInput = document.getElementById(targetInputId);
+          if (targetInput) targetInput.value = rawUrl;
+          const previewImg = document.getElementById(previewImgId);
+          if (previewImg) previewImg.src = rawUrl;
+          if (filenameEl) filenameEl.textContent = file.name + ' (업로드 완료)';
+          return;
+        }
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const mimeType = (file.type === 'image/png' && file.size < 1024 * 1024) ? 'image/png' : 'image/jpeg';
+        const dataUrl = canvas.toDataURL(mimeType, 0.85);
+
+        // Update target hidden input
+        const targetInput = document.getElementById(targetInputId);
+        if (targetInput) {
+          targetInput.value = dataUrl;
+        }
+
+        // Update preview image
+        const previewImg = document.getElementById(previewImgId);
+        if (previewImg) {
+          previewImg.src = dataUrl;
+        }
+
+        // Update filename status
+        if (filenameEl) {
+          const sizeKb = Math.round((dataUrl.length * 3) / 4 / 1024);
+          filenameEl.textContent = file.name + ' (' + sizeKb + ' KB - 업로드 완료)';
+        }
+      };
+      img.onerror = function() {
+        alert('이미지를 불러오는데 실패했습니다.');
+      };
+      img.src = e.target.result;
+    };
+    reader.onerror = function() {
+      alert('파일을 읽는데 실패했습니다.');
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetImageUpload(targetInputId, previewImgId, filenameElId, defaultUrl) {
+    const targetInput = document.getElementById(targetInputId);
+    if (targetInput) targetInput.value = defaultUrl;
+    const previewImg = document.getElementById(previewImgId);
+    if (previewImg) previewImg.src = defaultUrl;
+    const filenameEl = document.getElementById(filenameElId);
+    if (filenameEl) filenameEl.textContent = '기본 이미지로 복원됨';
+  }
+
+  // Handle URL hash on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash.replace('#tab-', '');
+    if (hash && tabIds.includes(hash)) {
+      switchTab(hash);
+    } else {
+      switchTab('inquiries');
+    }
+  });
+</script>
+{% endblock %}

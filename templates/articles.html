@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="py-16 bg-[#FAF7F2] min-h-[80vh]">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    
+    <!-- Title & Search Header -->
+    <div class="max-w-3xl mb-12 space-y-4">
+      <span class="text-xs font-bold uppercase tracking-wider text-[#EA580C]">
+        {{ '공식 아티클 & 칼럼' if lang == 'ko' else 'OFFICIAL ARTICLES & INSIGHTS' }}
+      </span>
+      <h1 class="text-3xl sm:text-4xl font-bold font-display text-[#1F1B18]">
+        {{ '부탄 라엘리안 소식 및 지적설계 아티클' if lang == 'ko' else 'News, Science & Philosophical Articles' }}
+      </h1>
+      <p class="text-sm text-[#5A4F44]">
+        {{ '엘로힘 메시지, 유전공학적 생명창조, 감각명상 연구, 그리고 대사관 프로젝트의 진전 소식을 전합니다.' if lang == 'ko' else 'Explore articles on Elohim messages, genetic research, meditation studies and Embassy updates.' }}
+      </p>
+
+      <!-- Category Filter Pills -->
+      <div class="flex flex-wrap gap-2 pt-2">
+        <a href="{{ url_for('articles_list') }}" class="px-3.5 py-1.5 rounded-full text-xs font-semibold {% if not current_cat %}bg-[#1F1B18] text-white{% else %}bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC]{% endif %}">
+          {{ '전체' if lang == 'ko' else 'All' }}
+        </a>
+        <a href="{{ url_for('articles_list', category='announcement') }}" class="px-3.5 py-1.5 rounded-full text-xs font-semibold {% if current_cat == 'announcement' %}bg-[#1F1B18] text-white{% else %}bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC]{% endif %}">
+          {{ '공지 및 소식' if lang == 'ko' else 'Announcements' }}
+        </a>
+        <a href="{{ url_for('articles_list', category='science') }}" class="px-3.5 py-1.5 rounded-full text-xs font-semibold {% if current_cat == 'science' %}bg-[#1F1B18] text-white{% else %}bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC]{% endif %}">
+          {{ '지적설계 & 과학' if lang == 'ko' else 'Science' }}
+        </a>
+        <a href="{{ url_for('articles_list', category='meditation') }}" class="px-3.5 py-1.5 rounded-full text-xs font-semibold {% if current_cat == 'meditation' %}bg-[#1F1B18] text-white{% else %}bg-white border border-[#D5C7B5] text-[#5A4F44] hover:bg-[#F0E8DC]{% endif %}">
+          {{ '감각명상 & 행복' if lang == 'ko' else 'Meditation' }}
+        </a>
+      </div>
+    </div>
+
+    <!-- Articles Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {% for post in posts %}
+      <article class="bg-white rounded-2xl overflow-hidden border border-[#E0D5C7] shadow-xs flex flex-col hover:shadow-md transition-shadow">
+        <div class="aspect-video relative overflow-hidden bg-stone-100">
+          <img src="{{ post.coverImage }}" alt="{{ post.title[lang] }}" class="w-full h-full object-cover">
+          <span class="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-xs text-[#8C4A1E]">
+            {{ post.category }}
+          </span>
+        </div>
+
+        <div class="p-6 flex-grow flex flex-col justify-between space-y-4">
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 text-xs text-[#8A7968]">
+              <span>{{ post.date }}</span>
+              <span>•</span>
+              <span>{{ post.readTime }}</span>
+              <span>•</span>
+              <span><i data-lucide="eye" class="w-3.5 h-3.5 inline"></i> {{ post.views or 0 }}</span>
+            </div>
+            <h2 class="font-bold text-lg font-display text-[#1F1B18] hover:text-[#EA580C] transition-colors line-clamp-2">
+              <a href="{{ url_for('article_detail', post_id=post.id) }}">{{ post.title[lang] }}</a>
+            </h2>
+            <p class="text-xs sm:text-sm text-[#615446] line-clamp-3 leading-relaxed">
+              {{ post.summary[lang] }}
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-[#F0E8DC] flex items-center justify-between text-xs">
+            <span class="text-[#8A7968] font-medium">{{ post.author }}</span>
+            <a href="{{ url_for('article_detail', post_id=post.id) }}" class="text-[#EA580C] font-semibold hover:underline flex items-center gap-1">
+              <span>{{ '읽기' if lang == 'ko' else 'Read' }}</span>
+              <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </a>
+          </div>
+        </div>
+      </article>
+      {% else %}
+      <div class="col-span-3 text-center py-16 bg-white rounded-2xl border border-[#E8DFD3]">
+        <p class="text-sm text-[#8C7A68]">{{ '해당 카테고리에 등록된 아티클이 없습니다.' if lang == 'ko' else 'No articles found in this category.' }}</p>
+      </div>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

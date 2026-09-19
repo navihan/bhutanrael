@@ -1,0 +1,6 @@
+{
+  "name": "부탄 라엘리안 무브먼트 | Bhutan Raëlian Movement",
+  "description": "부탄 라엘리안 무브먼트 공식 웹사이트 - 엘로힘의 메시지, 지적설계 철학, 대사관 프로젝트, 세미나 일정 및 관리자 제어 시스템",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
