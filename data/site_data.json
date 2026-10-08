@@ -127,7 +127,7 @@
       "id": "design",
       "icon": "dna",
       "title": {
-        "ko": "생명창조 -  DNA",
+        "ko": "생명창조 - DNA",
         "en": "Scientific Intelligent Design"
       },
       "tagline": {
@@ -136,7 +136,7 @@
       },
       "points": {
         "ko": [
-          "인간을 포함한 지구상의 모든 생명은 고대 원시인들이 신이라고  불렀던 엘로힘 이란 우주인들에 의해 창조된 것이다.  그들은 고도로 발달된 생명과학을 지니고 있었으며,  실험실에서  DNA를 합성 하여 단순한 생명체로부터 고등생물까지 모든 생명을 창조하였다.  오늘날 지구의 과학자들도 DNA를 조작하여 새로운 생명체를 창조할 수 있는데,  이 사실로 미루어 볼 때  먼 옛날  엘로힘에 의한 과학적 생명창조를 이해할 수 있다."
+          "인간을 포함한 지구상의 모든 생명은 고대 원시인들이 신이라고 불렀던 엘로힘이란 우주인들에 의해 창조된 것이다. 그들은 고도로 발달된 생명과학을 지니고 있었으며, 실험실에서 DNA를 합성하여 단순한 생명체로부터 고등생물까지 모든 생명을 창조하였다. 오늘날 지구의 과학자들도 DNA를 조작하여 새로운 생명체를 창조할 수 있는데, 이 사실로 미루어 볼 때 먼 옛날 엘로힘에 의한 과학적 생명창조를 이해할 수 있다."
         ],
         "en": [
           "All terrestrial organisms were scientifically synthesized by Elohim scientists in laboratories.",
@@ -148,49 +148,49 @@
       "image": "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?w=800&auto=format&fit=crop&q=80"
     },
     {
-      "id": "embassy",
-      "icon": "building-2",
+      "id": "apocalypse",
+      "icon": "sparkles",
       "title": {
         "ko": "아포칼립스 - APOCALYPSE",
-        "en": "The Extraterrestrial Embassy"
+        "en": "The Era of Apocalypse (Science & Revelation)"
       },
       "tagline": {
-        "ko": " 계시의 시대 또는 과학의 시대",
-        "en": "The first diplomatic embassy to welcome our creators back in peace"
+        "ko": "계시의 시대 또는 과학의 시대",
+        "en": "The golden age of scientific comprehension and cosmic unveiling"
       },
       "points": {
         "ko": [
-          "1945년 8월 6일 히로시마 원폭투하 이후 인류는 경이적인 과학기술의 발전을 거듭하여, 원자와 물질의 구조를 발견하고 생명창조기술을 개발했으며 우주의 신비를 벗겨내고 있다.  아포칼립스시대란 사물을  과학적으로 이해할 수 있는 시대를  의미하며, 계시의 시대 또는 과학의 시대라고도 일컫는다.  우주인 엘로힘은 이러한 시대에 맞춰 인류의 기원과 미래를 올바로 알리기 위해서 라엘을 그들의 혹성대사,  즉 메신저로 우리들에게 파견했다."
+          "1945년 8월 6일 히로시마 원폭투하 이후 인류는 경이적인 과학기술의 발전을 거듭하여, 원자와 물질의 구조를 발견하고 생명창조기술을 개발했으며 우주의 신비를 벗겨내고 있다. 아포칼립스시대란 사물을 과학적으로 이해할 수 있는 시대를 의미하며, 계시의 시대 또는 과학의 시대라고도 일컫는다. 우주인 엘로힘은 이러한 시대에 맞춰 인류의 기원과 미래를 올바로 알리기 위해서 라엘을 그들의 혹성대사, 즉 메신저로 우리들에게 파견했다."
         ],
         "en": [
-          "The Elohim will not impose their presence; they return only upon peaceful official diplomatic invitation.",
-          "Requires extraterritorial neutral sovereignty and guaranteed peaceful airspace.",
-          "Formal contact will inaugurate a new era of clean ecological energy and advanced curative medicine.",
-          "Bhutan’s non-aligned serenity makes it a sublime prospective host country."
+          "Beginning with the nuclear age on August 6, 1945, humanity entered the era of Apocalypse—meaning the unveiling of scientific truth.",
+          "Humanity now deciphers the secrets of matter, DNA synthesis, and interplanetary exploration.",
+          "The Elohim sent Raël as their planetary ambassador to convey the origin and peaceful future of humanity without supernatural dogma.",
+          "A transition into rational comprehension where science supplants superstition."
         ]
       },
-      "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80"
+      "image": "https://images.unsplash.com/photo-1507499739999-097706ad8914?w=800&auto=format&fit=crop&q=80"
     },
     {
-      "id": "meditation",
+      "id": "prophet",
       "icon": "heart",
       "title": {
-        "ko": "예언자  - PROPHET",
-        "en": "Sensual Meditation & Pure Happiness"
+        "ko": "예언자 - PROPHET",
+        "en": "Prophets & Messengers of Truth"
       },
       "tagline": {
         "ko": "인류의 마지막 메신저",
-        "en": "Awakening five senses to experience unconditional present happiness"
+        "en": "Awakening humanity with cosmic truth across historic epochs"
       },
       "points": {
         "ko": [
-          "엘로힘은 지구인류의 진보를 스스로에게 맡기는 대신 인류의 기원이 올바르게 전해져서 먼 훗날 이해될 수 있도록 각 시대에 맞춰 그들의 메신저를 파견했다.  지구상의 주요 종교 창시자들인 모세, 예수,석가, 마호메트 등은 대표적인 엘로힘의 메신저들이다.  예언자란  ‘진실을 밝히는 자’ 라는 의미이다."
+          "엘로힘은 지구인류의 진보를 스스로에게 맡기는 대신 인류의 기원이 올바르게 전해져서 먼 훗날 이해될 수 있도록 각 시대에 맞춰 그들의 메신저를 파견했다. 지구상의 주요 종교 창시자들인 모세, 예수, 석가, 마호메트 등은 대표적인 엘로힘의 메신저들이다. 예언자란 ‘진실을 밝히는 자’ 라는 의미이다."
         ],
         "en": [
-          "Transcend guilt and dogmatic asceticism; awaken the trillions of cells communicating with the cosmos.",
-          "Refine sight, sound, touch, taste, and smell to maximize natural dopamine and serotonin.",
-          "Daily smile exercises, self-compassion, and radiating unconditional peace to society.",
-          "Harmonizes effortlessly with Bhutan’s Gross National Happiness ethos."
+          "Rather than intervening directly, the Elohim dispatched messengers suited to the comprehension of each historical era.",
+          "Major historical figures such as Moses, Buddha, Jesus, and Muhammad were genuine prophetic messengers.",
+          "The word 'prophet' strictly translates to 'the revealer of truth'—guiding humanity through stages of maturity.",
+          "Raël is the final messenger sent to unveil the full truth in the scientific era."
         ]
       },
       "image": "https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=800&auto=format&fit=crop&q=80"
@@ -199,25 +199,50 @@
       "id": "infinity",
       "icon": "infinity",
       "title": {
-        "ko": "엘로힘 - ELOHIM  (하늘에서 온 사람들)",
-        "en": "Cosmic Infinity in Time & Space"
+        "ko": "엘로힘 - ELOHIM (하늘에서 온 사람들)",
+        "en": "Elohim - Those Who Came from the Sky"
       },
       "tagline": {
-        "ko": "지구상의 모든 생명을 과학적으로 창조한  다른 행성에서 온 과학자들",
-        "en": "An eternal universe without beginning or end across infinite scales"
+        "ko": "지구상의 모든 생명을 과학적으로 창조한 다른 행성에서 온 과학자들",
+        "en": "Extraterrestrial scientists who scientifically engineered terrestrial biology"
       },
       "points": {
         "ko": [
-          "영어의 GOD(신)는 히브리원전의 엘로힘(ELOHIM)을  오역한 것이다.  엘로힘은“ 하늘에서 온 사람들” 이라는  뜻으로서 엘로하(ELOHA)의  복수형이며, 지구상의 모든 생명을 과학적으로 창조한  다른 행성에서 온 과학자들을 지칭한다.  앞으로 지구의 과학자들도 다른 행성에 가서 생명을 창조하게 될 때  “엘로힘”으로 불리겠지만 그들은 결코 신이 아닌 것이다."
+          "영어의 GOD(신)는 히브리원전의 엘로힘(ELOHIM)을 오역한 것이다. 엘로힘은 “하늘에서 온 사람들”이라는 뜻으로서 엘로하(ELOHA)의 복수형이며, 지구상의 모든 생명을 과학적으로 창조한 다른 행성에서 온 과학자들을 지칭한다. 앞으로 지구의 과학자들도 다른 행성에 가서 생명을 창조하게 될 때 “엘로힘”으로 불리겠지만 그들은 결코 신이 아닌 것이다."
         ],
         "en": [
-          "Matter and energy are eternal; nothing comes from nothingness.",
-          "Infinitely small particles contain whole galaxies; our universe is a subatomic particle in a larger cosmos.",
-          "Dispels superstitious dogma in favor of rational fractal cosmology.",
-          "Instills deep humility and scientific kinship with all cosmic civilizations."
+          "The term 'God' originates from the mistranslation of the Hebrew plural noun 'Elohim'.",
+          "Elohim translates literally as 'Those who came from the sky'—mortal, advanced human scientists from another world.",
+          "When Earth's scientists soon create life on other worlds, they too will be 'Elohim' to that new generation of life.",
+          "Demystifies ancient theology and grounds cosmic existence in infinite fractal physics."
         ]
       },
-      "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&auto=format&fit=crop&q=80"
+      "image": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=800&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": "embassy",
+      "icon": "building-2",
+      "title": {
+        "ko": "대사관 - EMBASSY",
+        "en": "The Extraterrestrial Embassy"
+      },
+      "tagline": {
+        "ko": "공식적인 우주인 방문을 위한 대사관 건설추진",
+        "en": "Promoting Embassy Construction for the Official Extraterrestrial Visit"
+      },
+      "points": {
+        "ko": [
+          "인류가 우호적으로 엘로힘을 맞이할 준비가 되었을 때 그들은 공개적으로 방문하여 지구보다 2만 5천년 앞선 과학문명을 전수해 줄 것이다.",
+          "엘로힘은 라엘에게 그들을 맞이하기 위한 대사관을 건설하도록 부탁했다. 이 “대사관”이야말로 히브리성서에서 말하고 있는 인류 최후의 성전, 즉 “제3의 성전” 인 것이다.",
+          "대사관 건설에 필수적인 치외법권의 지위를 승인하고 자국의 영토를 제공하여 대사관이 건설되는 그 나라는 보장된 번영의 미래를 맞이하고, 우주인 엘로힘의 보호를 누리며 다가올 수천년 동안 정신적 및 과학적 중심지가 될 것이다."
+        ],
+        "en": [
+          "When humanity is ready to welcome the Elohim peacefully, they will visit openly and share a scientific civilization 25,000 years ahead of Earth.",
+          "The Elohim asked Raël to build an embassy to welcome them; this \"Embassy\" is the \"Third Temple\" prophesied in ancient Hebrew scriptures.",
+          "The nation granting essential extraterritoriality and territory for the embassy will enjoy guaranteed prosperity, the protection of the Elohim, and become the spiritual and scientific center for millennia."
+        ]
+      },
+      "image": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80"
     }
   ],
   "inquiries": [
@@ -396,6 +421,90 @@
         "한국어",
         "English",
         "Français"
+      ]
+    },
+    {
+      "id": "book-4",
+      "title": {
+        "ko": "인간복제 (Yes to Human Cloning)",
+        "en": "Yes to Human Cloning: Eternal Life Thanks to Science"
+      },
+      "author": "라엘 (Raël)",
+      "description": {
+        "ko": "인간복제는 신에 대한 도전이 아니라 과학이 인류에게 선사하는 궁극의 축복입니다. DNA 복제와 기억 전송을 통해 질병과 죽음을 극복하고 영원한 생명으로 나아가는 과학적 통찰.",
+        "en": "Human cloning is not a threat but science's ultimate breakthrough: opening the path to overcoming disease and achieving eternal life through genetic science."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1530497610245-94d3c16cda28?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/yes-to-human-cloning.pdf",
+      "pageCount": 172,
+      "languages": [
+        "한국어",
+        "English",
+        "Français",
+        "Español",
+        "日本語"
+      ]
+    },
+    {
+      "id": "book-5",
+      "title": {
+        "ko": "각성으로의 여행 1",
+        "en": "Journey to Awakening - Part 1"
+      },
+      "author": "라엘 (Raël)",
+      "description": {
+        "ko": "물질과 정신의 조화, 내면의 무한성을 깨우는 감각의 여정. 우주와 하나 되는 진정한 내적 자유와 각성의 첫걸음을 안내하는 가르침.",
+        "en": "The profound voyage inward to awaken cosmic consciousness, embracing inner infinity and spiritual liberation in harmony with the cosmos."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/journey-to-awakening-1.pdf",
+      "pageCount": 204,
+      "languages": [
+        "한국어",
+        "English",
+        "Français",
+        "日本語"
+      ]
+    },
+    {
+      "id": "book-6",
+      "title": {
+        "ko": "각성으로의 여행 2",
+        "en": "Journey to Awakening - Part 2"
+      },
+      "author": "라엘 (Raël)",
+      "description": {
+        "ko": "각성의 심화 단계로서 우주적 지성과 무한에 대한 깊은 성찰, 조건 없는 사랑과 비폭력의 실천을 담은 감각적 깨달음의 완성편.",
+        "en": "Deepening cosmic awareness, unconditional love, and sensory enlightenment in resonance with the infinite universe and planetary harmony."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/journey-to-awakening-2.pdf",
+      "pageCount": 218,
+      "languages": [
+        "한국어",
+        "English",
+        "Français"
+      ]
+    },
+    {
+      "id": "book-7",
+      "title": {
+        "ko": "하늘에서 온 사람들 (만화)",
+        "en": "People from the Sky (Comic)"
+      },
+      "author": "라엘 원작 (Raël / Illustrated Comic Edition)",
+      "description": {
+        "ko": "창조자 엘로힘의 메시지와 인류 창조의 진실, UFO 조우와 대사관 프로젝트를 남녀노소 누구나 쉽고 흥미진진하게 읽을 수 있도록 만화로 구성한 공식 그래픽노블.",
+        "en": "The extraordinary message of the Elohim and human origins presented in a vivid, easy-to-read comic and graphic novel format for all ages."
+      },
+      "coverImage": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80",
+      "downloadUrl": "https://www.rael.org/books/people-from-the-sky-comic.pdf",
+      "pageCount": 148,
+      "languages": [
+        "한국어",
+        "English",
+        "Français",
+        "日本語"
       ]
     }
   ],

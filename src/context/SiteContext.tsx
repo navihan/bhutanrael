@@ -10,7 +10,8 @@ import {
   Language,
   AdminRole,
   AdminUser,
-  AdminInvite
+  AdminInvite,
+  PhilosophyPillar
 } from '../types';
 import {
   defaultTheme,
@@ -18,7 +19,8 @@ import {
   defaultContent,
   defaultPosts,
   defaultEvents,
-  defaultBooks
+  defaultBooks,
+  defaultPhilosophyPillars
 } from '../data/defaultData';
 
 interface SiteContextType {
@@ -29,6 +31,7 @@ interface SiteContextType {
   posts: Post[];
   events: EventItem[];
   books: BookItem[];
+  philosophyPillars: PhilosophyPillar[];
   language: Language;
   isAdminOpen: boolean;
   isAdminAuthenticated: boolean;
@@ -59,10 +62,17 @@ interface SiteContextType {
   updateTheme: (theme: Partial<ThemeConfig>) => void;
   updateSeo: (seo: Partial<SeoConfig>) => void;
   updateContent: (content: Partial<SiteContent>) => void;
+  updateBooks: (books: BookItem[]) => void;
+  addBook: (book: Omit<BookItem, 'id'>) => BookItem;
+  updateBook: (book: BookItem) => void;
+  deleteBook: (id: string) => void;
+  resetBooksToDefault: () => void;
   addPost: (post: Omit<Post, 'id' | 'views'>) => Post;
   updatePost: (post: Post) => void;
   deletePost: (id: string) => void;
   incrementPostViews: (id: string) => void;
+  updatePhilosophyPillars: (pillars: PhilosophyPillar[]) => void;
+  updatePillar: (updated: PhilosophyPillar) => void;
   resetToDefault: () => void;
   exportData: () => void;
   importData: (jsonStr: string) => boolean;
@@ -263,7 +273,50 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   });
 
-  const [books] = useState<BookItem[]>(defaultBooks);
+  const [books, setBooks] = useState<BookItem[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY + '_books');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 7) {
+          return parsed;
+        }
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          const merged = [...parsed];
+          for (const defBook of defaultBooks) {
+            const exists = merged.some(b => b.id === defBook.id || b.title?.ko === defBook.title?.ko);
+            if (!exists) {
+              merged.push(defBook);
+            }
+          }
+          return merged;
+        }
+      }
+      return defaultBooks;
+    } catch {
+      return defaultBooks;
+    }
+  });
+
+  const [philosophyPillars, setPhilosophyPillars] = useState<PhilosophyPillar[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY + '_pillars');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length >= 4) {
+          const hasPillar5 = parsed.some((p: PhilosophyPillar) => p.id === 'embassy' || p.title?.ko?.includes('대사관'));
+          if (!hasPillar5) {
+            const pillar5 = defaultPhilosophyPillars.find(p => p.id === 'embassy');
+            if (pillar5) return [...parsed, pillar5];
+          }
+          return parsed;
+        }
+      }
+      return defaultPhilosophyPillars;
+    } catch {
+      return defaultPhilosophyPillars;
+    }
+  });
 
   const [adminUsers, setAdminUsers] = useState<AdminUser[]>(() => {
     try {
@@ -821,17 +874,101 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setPosts(prev => prev.map(p => p.id === id ? { ...p, views: p.views + 1 } : p));
   };
 
+  const updatePhilosophyPillars = (updated: PhilosophyPillar[]) => {
+    setPhilosophyPillars(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY + '_pillars', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to save pillars to localStorage', e);
+    }
+  };
+
+  const updatePillar = (updated: PhilosophyPillar) => {
+    setPhilosophyPillars(prev => {
+      const next = prev.map(p => p.id === updated.id ? updated : p);
+      try {
+        localStorage.setItem(STORAGE_KEY + '_pillars', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save pillars to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  const updateBooks = (updated: BookItem[]) => {
+    setBooks(updated);
+    try {
+      localStorage.setItem(STORAGE_KEY + '_books', JSON.stringify(updated));
+    } catch (e) {
+      console.warn('Failed to save books to localStorage', e);
+    }
+  };
+
+  const addBook = (newBookData: Omit<BookItem, 'id'>): BookItem => {
+    const newBook: BookItem = {
+      ...newBookData,
+      id: `book-${Date.now()}`
+    };
+    setBooks(prev => {
+      const next = [...prev, newBook];
+      try {
+        localStorage.setItem(STORAGE_KEY + '_books', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save books to localStorage', e);
+      }
+      return next;
+    });
+    return newBook;
+  };
+
+  const updateBook = (updated: BookItem) => {
+    setBooks(prev => {
+      const next = prev.map(b => b.id === updated.id ? updated : b);
+      try {
+        localStorage.setItem(STORAGE_KEY + '_books', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save books to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  const deleteBook = (id: string) => {
+    setBooks(prev => {
+      const next = prev.filter(b => b.id !== id);
+      try {
+        localStorage.setItem(STORAGE_KEY + '_books', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save books to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  const resetBooksToDefault = () => {
+    setBooks(defaultBooks);
+    try {
+      localStorage.setItem(STORAGE_KEY + '_books', JSON.stringify(defaultBooks));
+    } catch (e) {
+      console.warn('Failed to save books to localStorage', e);
+    }
+  };
+
   const resetToDefault = () => {
     setTheme(defaultTheme);
     setSeo(defaultSeo);
     setContent(defaultContent);
     setPosts(defaultPosts);
     setEvents(defaultEvents);
+    setBooks(defaultBooks);
+    setPhilosophyPillars(defaultPhilosophyPillars);
     localStorage.removeItem(STORAGE_KEY + '_theme');
     localStorage.removeItem(STORAGE_KEY + '_seo');
     localStorage.removeItem(STORAGE_KEY + '_content');
     localStorage.removeItem(STORAGE_KEY + '_posts');
     localStorage.removeItem(STORAGE_KEY + '_events');
+    localStorage.removeItem(STORAGE_KEY + '_books');
+    localStorage.removeItem(STORAGE_KEY + '_pillars');
   };
 
   const exportData = () => {
@@ -843,6 +980,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       content,
       posts,
       events,
+      books,
+      philosophyPillars,
       adminUsers: adminUsers.map(({ password, ...rest }) => rest), // exclude raw passwords for security
       adminInvites
     };
@@ -865,6 +1004,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (parsed.content) setContent(parsed.content);
       if (Array.isArray(parsed.posts)) setPosts(parsed.posts);
       if (Array.isArray(parsed.events)) setEvents(parsed.events);
+      if (Array.isArray(parsed.books)) updateBooks(parsed.books);
+      if (Array.isArray(parsed.philosophyPillars)) updatePhilosophyPillars(parsed.philosophyPillars);
       return true;
     } catch (err) {
       console.error('Failed to import backup data', err);
@@ -879,6 +1020,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     posts,
     events,
     books,
+    philosophyPillars,
     language
   };
 
@@ -892,6 +1034,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         posts,
         events,
         books,
+        philosophyPillars,
         language,
         isAdminOpen,
         isAdminAuthenticated,
@@ -922,10 +1065,17 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateTheme,
         updateSeo,
         updateContent,
+        updateBooks,
+        addBook,
+        updateBook,
+        deleteBook,
+        resetBooksToDefault,
         addPost,
         updatePost,
         deletePost,
         incrementPostViews,
+        updatePhilosophyPillars,
+        updatePillar,
         resetToDefault,
         exportData,
         importData

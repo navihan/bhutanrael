@@ -4,16 +4,19 @@ import { defaultPhilosophyPillars } from '../data/defaultData';
 import { Dna, Building2, Smile, Infinity, CheckCircle, ArrowUpRight, Sparkles, BookOpen } from 'lucide-react';
 
 export const PhilosophySection: React.FC = () => {
-  const { content, theme, language } = useSite();
+  const { content, theme, language, philosophyPillars } = useSite();
 
   const iconMap: Record<string, React.ElementType> = {
     dna: Dna,
     'building-2': Building2,
     heart: Smile,
     infinity: Infinity,
+    sparkles: Sparkles,
   };
 
-  const pillars = defaultPhilosophyPillars.map(p => ({
+  const rawPillars = (philosophyPillars && philosophyPillars.length > 0) ? philosophyPillars : defaultPhilosophyPillars;
+
+  const pillars = rawPillars.map(p => ({
     ...p,
     icon: iconMap[p.icon] || BookOpen
   }));
@@ -29,7 +32,7 @@ export const PhilosophySection: React.FC = () => {
             <span>{language === 'ko' ? '라엘리안 무브먼트 핵심 원리' : 'Core Raelian Philosophy'}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1915] font-display">
-            {language === 'ko' ? '라엘리안 무브먼트 4대 핵심 철학' : 'Intelligent Design & 4 Core Pillars'}
+            {language === 'ko' ? '라엘리안 무브먼트 5대 핵심 철학' : 'Intelligent Design & 5 Core Pillars'}
           </h2>
           <p className="text-[#665749] text-base leading-relaxed">
             {language === 'ko' 
@@ -38,17 +41,17 @@ export const PhilosophySection: React.FC = () => {
           </p>
         </div>
 
-        {/* All 4 Core Pillars Grid - Completely Visible with No Truncation */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8">
+        {/* All 5 Core Pillars Grid - Completely Visible with No Truncation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 sm:gap-6">
           {pillars.map((pillar, idx) => {
             const Icon = pillar.icon;
             return (
               <div
                 key={pillar.id}
-                className="bg-white rounded-2xl border border-[#E0D4C5] shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:-translate-y-1"
+                className="bg-white rounded-2xl border border-[#E0D4C5] shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between overflow-hidden group hover:-translate-y-1"
               >
                 {/* Image Banner */}
-                <div className="relative h-44 sm:h-48 w-full overflow-hidden bg-stone-100">
+                <div className="relative h-40 sm:h-44 w-full overflow-hidden bg-stone-100">
                   <img
                     src={pillar.image}
                     alt={pillar.title[language]}
@@ -60,7 +63,7 @@ export const PhilosophySection: React.FC = () => {
                   {/* Pillar Index & Icon Pill */}
                   <div className="absolute top-3 left-3 flex items-center gap-2">
                     <span 
-                      className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md text-white shadow-xs"
+                      className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md text-white shadow-xs"
                       style={{ backgroundColor: theme.accentColor }}
                     >
                       Pillar 0{idx + 1}
@@ -68,37 +71,37 @@ export const PhilosophySection: React.FC = () => {
                   </div>
 
                   {/* Icon floating badge */}
-                  <div className="absolute top-3 right-3 w-8 h-8 rounded-lg bg-white/90 backdrop-blur-xs flex items-center justify-center text-[#EA580C] shadow-xs">
-                    <Icon className="w-4 h-4" />
+                  <div className="absolute top-3 right-3 w-7 h-7 rounded-lg bg-white/90 backdrop-blur-xs flex items-center justify-center text-[#EA580C] shadow-xs">
+                    <Icon className="w-3.5 h-3.5" />
                   </div>
 
                   {/* Tagline on image */}
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
-                    <p className="text-xs font-semibold leading-snug drop-shadow-sm">
+                  <div className="absolute bottom-2.5 left-3 right-3 text-white">
+                    <p className="text-[11px] font-semibold leading-snug drop-shadow-sm">
                       {pillar.tagline[language].trim()}
                     </p>
                   </div>
                 </div>
 
                 {/* Content Body */}
-                <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4 text-left">
+                <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between space-y-3 text-left">
                   <div className="space-y-2">
                     {/* Full Title without any truncation or splitting */}
-                    <h3 className="text-lg sm:text-xl font-bold text-[#1E1915] font-display leading-snug">
+                    <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display leading-snug">
                       {pillar.title[language]}
                     </h3>
                     
                     {/* Full Tagline Subtitle */}
-                    <p className="text-xs sm:text-sm font-semibold text-[#EA580C] leading-snug">
+                    <p className="text-xs font-semibold text-[#EA580C] leading-snug">
                       {pillar.tagline[language].trim()}
                     </p>
 
                     {/* Full Explanation Points / Paragraphs */}
                     <div className="pt-2 border-t border-[#F0E8DC] space-y-2">
                       {pillar.points[language].map((pt, i) => (
-                        <div key={i} className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-[#EA580C] shrink-0 mt-1" />
-                          <p className="text-xs sm:text-sm text-[#4E4135] leading-relaxed font-normal">
+                        <div key={i} className="flex items-start gap-1.5">
+                          <CheckCircle className="w-3.5 h-3.5 text-[#EA580C] shrink-0 mt-0.5" />
+                          <p className="text-xs text-[#4E4135] leading-relaxed font-normal">
                             {pt}
                           </p>
                         </div>
@@ -110,10 +113,10 @@ export const PhilosophySection: React.FC = () => {
                   <div className="pt-3 border-t border-[#F0E8DC] flex items-center justify-between">
                     <a
                       href="#books"
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1E1915] hover:text-[#EA580C] transition-colors"
+                      className="inline-flex items-center gap-1 text-[11px] font-bold text-[#1E1915] hover:text-[#EA580C] transition-colors"
                     >
                       <span>{language === 'ko' ? '관련 무료 도서 읽기' : 'Read Free eBook'}</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      <ArrowUpRight className="w-3 h-3" />
                     </a>
                   </div>
                 </div>

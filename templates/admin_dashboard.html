@@ -77,7 +77,7 @@
           <!-- Philosophy Pillars Board Tab -->
           <button onclick="switchTab('philosophy')" id="tab-btn-philosophy" class="w-full text-left px-4 py-2.5 rounded-xl text-xs font-semibold text-[#4A4036] hover:bg-[#F2EAE0] transition-colors flex items-center gap-2.5">
             <i data-lucide="sparkles" class="w-4 h-4"></i>
-            <span>{{ '지적설계 4대 철학 기둥' if lang == 'ko' else 'Philosophy Pillars' }}</span>
+            <span>{{ '라엘리안 5대 핵심 철학' if lang == 'ko' else '5 Philosophy Pillars' }}</span>
           </button>
 
           <!-- Posts Tab -->
@@ -630,11 +630,11 @@
           </form>
         </div>
 
-        <!-- Tab: Philosophy 4 Pillars Board -->
+        <!-- Tab: Philosophy 5 Pillars Board -->
         <div id="tab-philosophy" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
           <div class="border-b border-[#E8DFD3] pb-4">
-            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '지적설계 4대 철학 기둥 관리 (Philosophy Pillars)' if lang == 'ko' else 'Philosophy Pillars Board' }}</h2>
-            <p class="text-xs text-[#7A6B5D]">{{ '메인 페이지의 4대 핵심 철학 카드(지적설계, 대사관, 감각명상, 무한성)의 타이틀과 설명 목록을 편집합니다.' }}</p>
+            <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '라엘리안 무브먼트 5대 핵심 철학 기둥 관리 (5 Philosophy Pillars)' if lang == 'ko' else '5 Philosophy Pillars Board' }}</h2>
+            <p class="text-xs text-[#7A6B5D]">{{ '메인 페이지의 5대 핵심 철학 카드(생명창조, 아포칼립스, 예언자, 엘로힘, 대사관)의 타이틀과 설명 목록을 편집합니다.' if lang == 'ko' else 'Edit title, tagline, and explanation points for all 5 core philosophy pillars.' }}</p>
           </div>
 
           <form action="{{ url_for('admin_update_philosophy') }}" method="POST" class="space-y-6">
@@ -679,7 +679,7 @@
             {% endfor %}
 
             <button type="submit" class="px-6 py-3 rounded-xl bg-[#EA580C] text-white text-xs font-bold hover:bg-[#C2410C] transition-colors shadow-sm">
-              {{ '4대 철학 기둥 수정사항 저장' if lang == 'ko' else 'Save Philosophy Pillars' }}
+              {{ '5대 철학 기둥 수정사항 저장' if lang == 'ko' else 'Save 5 Philosophy Pillars' }}
             </button>
           </form>
         </div>
@@ -876,8 +876,8 @@
         <div id="tab-books" class="tab-panel hidden bg-white p-8 rounded-3xl border border-[#DDD0C0] shadow-sm space-y-8">
           <div class="flex items-center justify-between border-b border-[#E8DFD3] pb-4">
             <div>
-              <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ '라엘리안 무료 도서 관리' if lang == 'ko' else 'Manage Books' }}</h2>
-              <p class="text-xs text-[#7A6B5D]">{{ '도서 소개글, 표지 이미지 및 PDF 무료 다운로드 URL을 관리합니다.' }}</p>
+              <h2 class="text-lg font-bold font-display text-[#1F1B18]">{{ ('라엘리안 무료 전자책 관리 (총 ' ~ (site_data.books|length) ~ '권)') if lang == 'ko' else 'Manage eBooks' }}</h2>
+              <p class="text-xs text-[#7A6B5D]">{{ '인간복제, 각성으로의 여행 1/2, 하늘에서 온 사람들 만화 등 도서 소개글, 표지 이미지 및 PDF 무료 다운로드 URL을 관리합니다.' }}</p>
             </div>
           </div>
 

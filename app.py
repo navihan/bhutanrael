@@ -345,7 +345,7 @@ def admin_update_philosophy():
             pillar['points']['en'] = [p.strip() for p in pts_en.split('\n') if p.strip()]
             
     save_data(data)
-    flash('지적설계 4대 철학 기둥 내용이 수정 및 저장되었습니다.', 'success')
+    flash('라엘리안 무브먼트 5대 핵심 철학 기둥 내용이 수정 및 저장되었습니다.', 'success')
     return redirect(url_for('admin_dashboard') + '#tab-philosophy')
 
 # 3. Administrator Team Management (List, Add/Invite, Edit, Delete)

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useSite } from '../context/SiteContext';
-import { Post, PostCategory, ThemeConfig, SeoConfig, SiteContent } from '../types';
+import { Post, PostCategory, ThemeConfig, SeoConfig, SiteContent, BookItem } from '../types';
+import { defaultPhilosophyPillars, defaultBooks } from '../data/defaultData';
 import {
   X,
   Plus,
@@ -27,12 +28,13 @@ import {
   Users,
   UserPlus,
   Lock,
-  Shield
+  Shield,
+  BookOpen
 } from 'lucide-react';
 import { ImageUploader } from './ImageUploader';
 import { AdminManagementTab } from './AdminManagementTab';
 
-type AdminTab = 'posts' | 'admins' | 'content' | 'theme' | 'seo' | 'backup';
+type AdminTab = 'posts' | 'admins' | 'content' | 'philosophy' | 'books' | 'theme' | 'seo' | 'backup';
 
 export const AdminModal: React.FC = () => {
   const {
@@ -54,6 +56,15 @@ export const AdminModal: React.FC = () => {
     updateSeo,
     content,
     updateContent,
+    philosophyPillars,
+    updatePhilosophyPillars,
+    updatePillar,
+    books,
+    updateBooks,
+    addBook,
+    updateBook,
+    deleteBook,
+    resetBooksToDefault,
     posts,
     addPost,
     updatePost,
@@ -205,6 +216,95 @@ export const AdminModal: React.FC = () => {
     }
   };
 
+  // Book Editor State & Handlers
+  const [editingBook, setEditingBook] = useState<BookItem | null>(null);
+  const [isCreatingNewBook, setIsCreatingNewBook] = useState(false);
+  const [bookForm, setBookForm] = useState({
+    titleKo: '',
+    titleEn: '',
+    author: '라엘 (Raël)',
+    pageCount: 200,
+    downloadUrl: 'https://www.rael.org/books/',
+    coverImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80',
+    descKo: '',
+    descEn: '',
+    languages: '한국어, English, Français'
+  });
+
+  const handleStartCreateBook = () => {
+    setEditingBook(null);
+    setBookForm({
+      titleKo: '',
+      titleEn: '',
+      author: '라엘 (Raël)',
+      pageCount: 200,
+      downloadUrl: 'https://www.rael.org/books/',
+      coverImage: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80',
+      descKo: '',
+      descEn: '',
+      languages: '한국어, English, Français'
+    });
+    setIsCreatingNewBook(true);
+  };
+
+  const handleStartEditBook = (book: BookItem) => {
+    setIsCreatingNewBook(false);
+    setEditingBook(book);
+    setBookForm({
+      titleKo: book.title.ko,
+      titleEn: book.title.en,
+      author: book.author,
+      pageCount: book.pageCount,
+      downloadUrl: book.downloadUrl,
+      coverImage: book.coverImage,
+      descKo: book.description.ko,
+      descEn: book.description.en,
+      languages: book.languages.join(', ')
+    });
+  };
+
+  const handleSaveBook = (e: React.FormEvent) => {
+    e.preventDefault();
+    const langArray = bookForm.languages
+      .split(',')
+      .map(l => l.trim())
+      .filter(l => l.length > 0);
+
+    if (editingBook) {
+      updateBook({
+        ...editingBook,
+        title: { ko: bookForm.titleKo, en: bookForm.titleEn },
+        author: bookForm.author,
+        pageCount: Number(bookForm.pageCount) || 100,
+        downloadUrl: bookForm.downloadUrl,
+        coverImage: bookForm.coverImage,
+        description: { ko: bookForm.descKo, en: bookForm.descEn },
+        languages: langArray.length > 0 ? langArray : ['한국어', 'English']
+      });
+      showNotification(language === 'ko' ? `"${bookForm.titleKo}" 도서 정보가 수정되었습니다.` : 'Book updated successfully.');
+    } else {
+      addBook({
+        title: { ko: bookForm.titleKo, en: bookForm.titleEn },
+        author: bookForm.author,
+        pageCount: Number(bookForm.pageCount) || 100,
+        downloadUrl: bookForm.downloadUrl,
+        coverImage: bookForm.coverImage,
+        description: { ko: bookForm.descKo, en: bookForm.descEn },
+        languages: langArray.length > 0 ? langArray : ['한국어', 'English']
+      });
+      showNotification(language === 'ko' ? `새 도서 "${bookForm.titleKo}"가 등록되었습니다.` : 'New book added successfully.');
+    }
+    setEditingBook(null);
+    setIsCreatingNewBook(false);
+  };
+
+  const handleDeleteBook = (id: string, title: string) => {
+    if (window.confirm(language === 'ko' ? `"${title}" 도서를 정말로 삭제하시겠습니까?` : `Are you sure you want to delete "${title}"?`)) {
+      deleteBook(id);
+      showNotification(language === 'ko' ? '도서가 삭제되었습니다.' : 'Book deleted.');
+    }
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -263,7 +363,7 @@ export const AdminModal: React.FC = () => {
               </span>
               {[
                 { id: '#about', label: language === 'ko' ? '소개' : 'About' },
-                { id: '#philosophy', label: language === 'ko' ? '철학' : 'Philosophy' },
+                { id: '#philosophy', label: language === 'ko' ? '5대 철학' : 'Philosophy' },
                 { id: '#embassy', label: language === 'ko' ? '대사관' : 'Embassy' },
                 { id: '#articles', label: language === 'ko' ? '소식' : 'News' },
                 { id: '#books', label: language === 'ko' ? '도서' : 'Books' },
@@ -352,6 +452,30 @@ export const AdminModal: React.FC = () => {
           >
             <Layout className="w-4 h-4" />
             <span>{language === 'ko' ? '메인페이지 콘텐츠' : 'Main Content'}</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('philosophy'); setIsCreatingNewPost(false); setEditingPost(null); }}
+            className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'philosophy'
+                ? 'border-[#EA580C] text-[#EA580C] bg-[#FAF7F2]'
+                : 'border-transparent text-[#615142] hover:text-[#1E1915]'
+            }`}
+          >
+            <Sparkles className="w-4 h-4" />
+            <span>{language === 'ko' ? '5대 핵심 철학' : '5 Pillars'} ({philosophyPillars?.length || 5})</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('books'); setIsCreatingNewPost(false); setEditingPost(null); }}
+            className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'books'
+                ? 'border-[#EA580C] text-[#EA580C] bg-[#FAF7F2]'
+                : 'border-transparent text-[#615142] hover:text-[#1E1915]'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>{language === 'ko' ? '무료 전자책 관리' : 'eBooks'} ({books?.length || 7})</span>
           </button>
 
           <button
@@ -1096,10 +1220,531 @@ export const AdminModal: React.FC = () => {
                 </div>
               </div>
 
+              {/* 5 Core Pillars Section Box */}
+              <div className="bg-white rounded-xl border border-[#DDD0C0] p-6 space-y-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-sm font-bold text-[#1E1915] uppercase tracking-wider text-[#EA580C] flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      <span>5. 라엘리안 무브먼트 5대 핵심 철학 기둥 (5 Core Philosophy Pillars)</span>
+                    </h4>
+                    <p className="text-xs text-[#7A6B5B] mt-1">
+                      {language === 'ko'
+                        ? '생명창조(DNA), 아포칼립스, 예언자, 엘로힘, 대사관 5개 핵심 철학의 상세 내용과 Pillar 05 대사관을 전용 탭에서 손쉽게 수정 및 관리할 수 있습니다.'
+                        : 'Manage all 5 core philosophy pillars including Pillar 05 Extraterrestrial Embassy.'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('philosophy')}
+                    className="px-4 py-2 rounded-xl text-white text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-1.5 shrink-0"
+                    style={{ backgroundColor: theme.accentColor }}
+                  >
+                    <Sparkles className="w-3.5 h-3.5" />
+                    <span>{language === 'ko' ? '5대 핵심 철학 전용 관리탭 이동' : 'Go to 5 Pillars Tab'}</span>
+                  </button>
+                </div>
+              </div>
+
             </div>
           )}
 
-          {/* TAB 3: DESIGN & THEME */}
+          {/* TAB: PHILOSOPHY 5 PILLARS */}
+          {activeTab === 'philosophy' && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8DFD3] pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EA580C]/10 text-[#EA580C] uppercase tracking-wider">
+                      5 Core Pillars
+                    </span>
+                    <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display">
+                      {language === 'ko' ? '라엘리안 무브먼트 5대 핵심 철학 기둥 관리' : '5 Core Philosophy Pillars Management'}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#7A6B5B] mt-1">
+                    {language === 'ko'
+                      ? '메인 화면에 노출되는 5가지 핵심 철학(기둥 01~05)의 한글/영문 제목, 슬로건, 핵심 설명 포인트 및 이미지를 자유롭게 수정하고 실시간 저장합니다.'
+                      : 'Edit titles, taglines, bullet points, and images for all 5 core philosophy pillars.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      if (window.confirm(language === 'ko' ? '5대 철학 내용을 기본값으로 초기화하시겠습니까?' : 'Reset all 5 pillars to default values?')) {
+                        updatePhilosophyPillars(defaultPhilosophyPillars);
+                        showNotification(language === 'ko' ? '5대 철학 기둥이 기본값으로 초기화되었습니다.' : 'Pillars reset to default.');
+                      }
+                    }}
+                    className="px-3 py-2 rounded-xl border border-[#DDD0C0] text-[#6B5A4A] hover:bg-[#F2EAE0] text-xs font-semibold cursor-pointer transition-colors"
+                  >
+                    {language === 'ko' ? '기본값 복원' : 'Reset Defaults'}
+                  </button>
+                  <button
+                    onClick={() => showNotification(language === 'ko' ? '5대 핵심 철학 기둥 내용이 안전하게 저장되었습니다.' : 'All 5 pillars saved successfully.')}
+                    className="px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xs cursor-pointer flex items-center gap-1.5"
+                    style={{ backgroundColor: theme.accentColor }}
+                  >
+                    <Check className="w-4 h-4" />
+                    <span>{language === 'ko' ? '전체 저장 완료' : 'Save Changes'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Pillars list */}
+              <div className="space-y-6">
+                {(philosophyPillars || defaultPhilosophyPillars).map((pillar, idx) => (
+                  <div
+                    key={pillar.id}
+                    className="bg-white rounded-2xl border border-[#DDD0C0] p-5 sm:p-6 shadow-xs space-y-4"
+                  >
+                    <div className="flex items-center justify-between border-b border-[#F0E8DC] pb-3">
+                      <div className="flex items-center gap-3">
+                        <span 
+                          className="w-7 h-7 rounded-lg text-white text-xs font-bold flex items-center justify-center shadow-xs"
+                          style={{ backgroundColor: theme.accentColor }}
+                        >
+                          0{idx + 1}
+                        </span>
+                        <div>
+                          <h4 className="text-sm sm:text-base font-bold text-[#1E1915]">
+                            {pillar.title.ko}
+                          </h4>
+                          <span className="text-[11px] text-[#8C7A68]">
+                            ID: {pillar.id} | {pillar.title.en}
+                          </span>
+                        </div>
+                      </div>
+
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-md bg-[#FAF4ED] text-[#EA580C] border border-[#EEDFCE]">
+                        Pillar 0{idx + 1}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          기둥 제목 (한국어) *
+                        </label>
+                        <input
+                          type="text"
+                          value={pillar.title.ko}
+                          onChange={(e) => {
+                            const updated = { ...pillar, title: { ...pillar.title, ko: e.target.value } };
+                            updatePillar(updated);
+                          }}
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-bold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          Title (English) *
+                        </label>
+                        <input
+                          type="text"
+                          value={pillar.title.en}
+                          onChange={(e) => {
+                            const updated = { ...pillar, title: { ...pillar.title, en: e.target.value } };
+                            updatePillar(updated);
+                          }}
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-bold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          핵심 슬로건 / 부제 (한국어)
+                        </label>
+                        <input
+                          type="text"
+                          value={pillar.tagline.ko}
+                          onChange={(e) => {
+                            const updated = { ...pillar, tagline: { ...pillar.tagline, ko: e.target.value } };
+                            updatePillar(updated);
+                          }}
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          Tagline / Subtitle (English)
+                        </label>
+                        <input
+                          type="text"
+                          value={pillar.tagline.en}
+                          onChange={(e) => {
+                            const updated = { ...pillar, tagline: { ...pillar.tagline, en: e.target.value } };
+                            updatePillar(updated);
+                          }}
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          세부 핵심 포인트 목록 (한국어 - 여러 문장은 줄바꿈으로 구분)
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={pillar.points.ko.join('\n')}
+                          onChange={(e) => {
+                            const newLines = e.target.value.split('\n').filter(Boolean);
+                            const updated = { ...pillar, points: { ...pillar.points, ko: newLines } };
+                            updatePillar(updated);
+                          }}
+                          placeholder="줄바꿈으로 포인트를 구분하여 입력하세요."
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl leading-relaxed font-sans"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          Key Bullet Points (English - Line separated)
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={pillar.points.en.join('\n')}
+                          onChange={(e) => {
+                            const newLines = e.target.value.split('\n').filter(Boolean);
+                            const updated = { ...pillar, points: { ...pillar.points, en: newLines } };
+                            updatePillar(updated);
+                          }}
+                          placeholder="Separate points with new lines."
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl leading-relaxed font-sans"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <ImageUploader
+                        id={`pillar-${pillar.id}-image-uploader`}
+                        label={`${language === 'ko' ? '기둥 대표 배경 이미지' : 'Pillar Background Image'} (${pillar.title.ko})`}
+                        helperText={language === 'ko' ? '카드 상단에 표시될 고화질 이미지를 드래그하거나 선택하여 업로드하세요.' : 'Upload background image for this pillar card.'}
+                        recommendedSize="800 × 500px 권장"
+                        value={pillar.image}
+                        onChange={(newImg) => {
+                          const updated = { ...pillar, image: newImg };
+                          updatePillar(updated);
+                          showNotification(`${pillar.title.ko} 이미지가 변경되었습니다.`);
+                        }}
+                        language={language}
+                        aspectRatio="wide"
+                        defaultValue={pillar.image}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: FREE EBOOKS MANAGEMENT */}
+          {activeTab === 'books' && (
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8DFD3] pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EA580C]/10 text-[#EA580C] uppercase tracking-wider">
+                      eBook Library ({books.length} Books)
+                    </span>
+                    <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display">
+                      {language === 'ko' ? '라엘리안 공식 무료 전자책 라이브러리 관리' : 'Official Free eBook Library Management'}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#7A6B5B] mt-1">
+                    {language === 'ko'
+                      ? '메인 페이지의 무료 전자책 섹션에 노출되는 도서(인간복제, 각성으로의 여행 1/2, 하늘에서 온 사람들 만화 등)의 정보, PDF 다운로드 링크 및 표지를 관리합니다.'
+                      : 'Manage free downloadable eBooks displayed on the main site, including PDF links, page counts, and book covers.'}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => {
+                      if (window.confirm(language === 'ko' ? '공식 7권 기본 도서 목록으로 초기화하시겠습니까?' : 'Restore official 7 default eBooks?')) {
+                        resetBooksToDefault();
+                        showNotification(language === 'ko' ? '공식 7권 기본 도서 목록이 복원되었습니다.' : 'Default 7 eBooks restored.');
+                      }
+                    }}
+                    className="px-3 py-2 rounded-xl border border-[#DDD0C0] text-[#6B5A4A] hover:bg-[#F2EAE0] text-xs font-semibold cursor-pointer transition-colors"
+                  >
+                    {language === 'ko' ? '기본 7권 복원' : 'Restore Defaults'}
+                  </button>
+
+                  <button
+                    onClick={handleStartCreateBook}
+                    className="px-4 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xs cursor-pointer flex items-center gap-1.5"
+                    style={{ backgroundColor: theme.accentColor }}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>{language === 'ko' ? '새 도서 등록' : 'Add eBook'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Add / Edit Form Modal or Panel */}
+              {(isCreatingNewBook || editingBook) && (
+                <div className="bg-white rounded-2xl border-2 border-[#EA580C]/40 p-5 sm:p-6 shadow-md space-y-4 animate-in fade-in-50 duration-150">
+                  <div className="flex items-center justify-between border-b border-[#F0E8DC] pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#EA580C]" />
+                      <h4 className="text-sm sm:text-base font-bold text-[#1E1915]">
+                        {editingBook
+                          ? (language === 'ko' ? `도서 정보 수정: ${editingBook.title.ko}` : `Edit eBook: ${editingBook.title.en}`)
+                          : (language === 'ko' ? '새로운 전자책 등록' : 'Add New eBook')}
+                      </h4>
+                    </div>
+                    <button
+                      onClick={() => { setEditingBook(null); setIsCreatingNewBook(false); }}
+                      className="text-xs text-[#7A6B5B] hover:text-[#1E1915] cursor-pointer"
+                    >
+                      {language === 'ko' ? '취소 (닫기)' : 'Cancel'}
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleSaveBook} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          도서명 (한국어) *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={bookForm.titleKo}
+                          onChange={(e) => setBookForm({ ...bookForm, titleKo: e.target.value })}
+                          placeholder="예: 인간복제 (Yes to Human Cloning)"
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-bold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          Book Title (English) *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={bookForm.titleEn}
+                          onChange={(e) => setBookForm({ ...bookForm, titleEn: e.target.value })}
+                          placeholder="Ex: Yes to Human Cloning"
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-bold"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          저자 (Author) *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={bookForm.author}
+                          onChange={(e) => setBookForm({ ...bookForm, author: e.target.value })}
+                          className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                            페이지 수
+                          </label>
+                          <input
+                            type="number"
+                            value={bookForm.pageCount}
+                            onChange={(e) => setBookForm({ ...bookForm, pageCount: Number(e.target.value) || 100 })}
+                            className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                            지원 언어 (쉼표 구분)
+                          </label>
+                          <input
+                            type="text"
+                            value={bookForm.languages}
+                            onChange={(e) => setBookForm({ ...bookForm, languages: e.target.value })}
+                            placeholder="한국어, English, Français"
+                            className="w-full px-3 py-2 text-xs sm:text-sm bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          무료 PDF 다운로드 링크 (URL) *
+                        </label>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="url"
+                            required
+                            value={bookForm.downloadUrl}
+                            onChange={(e) => setBookForm({ ...bookForm, downloadUrl: e.target.value })}
+                            placeholder="https://www.rael.org/books/..."
+                            className="flex-1 px-3 py-2 text-xs font-mono bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl"
+                          />
+                          {bookForm.downloadUrl && (
+                            <a
+                              href={bookForm.downloadUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-2 rounded-xl bg-stone-100 border border-stone-200 text-stone-700 text-xs font-semibold hover:bg-stone-200 flex items-center gap-1 shrink-0"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              <span>열기 테스트</span>
+                            </a>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <ImageUploader
+                          id="admin-book-cover-uploader"
+                          label={language === 'ko' ? '도서 표지 이미지' : 'Book Cover Image'}
+                          helperText={language === 'ko' ? '도서 표지 고화질 이미지를 업로드하거나 URL을 입력하세요.' : 'Upload or provide book cover image.'}
+                          recommendedSize="세로형 600 × 800px 권장"
+                          value={bookForm.coverImage}
+                          onChange={(newImg) => setBookForm({ ...bookForm, coverImage: newImg })}
+                          language={language}
+                          aspectRatio="square"
+                          defaultValue={bookForm.coverImage}
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          도서 소개 요약 (한국어)
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={bookForm.descKo}
+                          onChange={(e) => setBookForm({ ...bookForm, descKo: e.target.value })}
+                          placeholder="도서에 대한 핵심 소개글을 작성하세요..."
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl leading-relaxed"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          Description (English)
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={bookForm.descEn}
+                          onChange={(e) => setBookForm({ ...bookForm, descEn: e.target.value })}
+                          placeholder="Book description in English..."
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl leading-relaxed"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#F0E8DC]">
+                      <button
+                        type="button"
+                        onClick={() => { setEditingBook(null); setIsCreatingNewBook(false); }}
+                        className="px-4 py-2 rounded-xl border border-[#DDD0C0] text-xs font-semibold text-[#665544] hover:bg-[#F2EAE0] cursor-pointer"
+                      >
+                        취소
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 py-2 rounded-xl text-white text-xs sm:text-sm font-semibold shadow-xs cursor-pointer flex items-center gap-1.5"
+                        style={{ backgroundColor: theme.accentColor }}
+                      >
+                        <Check className="w-4 h-4" />
+                        <span>{editingBook ? '도서 정보 수정 저장' : '새 도서 등록 완료'}</span>
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Books List */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {books.map((book, idx) => (
+                  <div
+                    key={book.id}
+                    className="bg-white rounded-2xl border border-[#DDD0C0] p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-[#EA580C]/40 transition-all gap-4"
+                  >
+                    <div className="flex gap-4">
+                      {/* Cover Thumbnail */}
+                      <div className="w-20 h-28 rounded-lg overflow-hidden bg-stone-100 border border-[#DDD0C0] shrink-0 shadow-xs relative">
+                        <img
+                          src={book.coverImage}
+                          alt={book.title.ko}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80';
+                          }}
+                        />
+                        <span className="absolute bottom-1 right-1 text-[9px] bg-black/70 text-white px-1 rounded font-bold">
+                          0{idx + 1}
+                        </span>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0 space-y-1">
+                        <div className="flex items-center justify-between gap-1">
+                          <span className="text-[10px] font-bold text-[#EA580C] uppercase tracking-wide">
+                            {book.author}
+                          </span>
+                          <span className="text-[10px] bg-stone-100 text-stone-600 px-2 py-0.5 rounded-full font-semibold shrink-0">
+                            {book.pageCount}쪽
+                          </span>
+                        </div>
+
+                        <h4 className="text-sm font-bold text-[#1E1915] leading-snug line-clamp-1">
+                          {book.title.ko}
+                        </h4>
+                        <p className="text-[11px] text-[#7A6B5B] line-clamp-1">
+                          {book.title.en}
+                        </p>
+
+                        <p className="text-xs text-[#55473A] line-clamp-2 leading-relaxed pt-1">
+                          {book.description.ko}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Bottom Actions */}
+                    <div className="pt-3 border-t border-[#F2ECE2] flex items-center justify-between gap-2 text-xs">
+                      <a
+                        href={book.downloadUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-[#EA580C] hover:underline font-mono truncate flex items-center gap-1 max-w-[200px] sm:max-w-[240px]"
+                        title={book.downloadUrl}
+                      >
+                        <ExternalLink className="w-3 h-3 shrink-0" />
+                        <span className="truncate">{book.downloadUrl}</span>
+                      </a>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => handleStartEditBook(book)}
+                          className="px-2.5 py-1 rounded-lg border border-[#DDD0C0] text-[#4A3D30] hover:bg-[#FAF7F2] text-xs font-semibold cursor-pointer flex items-center gap-1"
+                        >
+                          <Edit className="w-3 h-3" />
+                          <span>수정</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteBook(book.id, book.title.ko)}
+                          className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 cursor-pointer transition-colors"
+                          title="삭제"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           {activeTab === 'theme' && (
             <div className="space-y-6">
               <div>

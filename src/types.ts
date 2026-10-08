@@ -169,6 +169,24 @@ export interface SiteContent {
   };
 }
 
+export interface PhilosophyPillar {
+  id: string;
+  icon: string;
+  title: {
+    ko: string;
+    en: string;
+  };
+  tagline: {
+    ko: string;
+    en: string;
+  };
+  points: {
+    ko: string[];
+    en: string[];
+  };
+  image: string;
+}
+
 export interface SiteState {
   theme: ThemeConfig;
   seo: SeoConfig;
@@ -176,5 +194,6 @@ export interface SiteState {
   posts: Post[];
   events: EventItem[];
   books: BookItem[];
+  philosophyPillars: PhilosophyPillar[];
   language: Language;
 }

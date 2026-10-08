@@ -31,10 +31,10 @@ export const BooksSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EFE8DC] text-[#6E5D4C] text-xs font-semibold uppercase tracking-wider">
+        <div className="text-center max-w-3xl mx-auto mb-14 space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#EFE8DC] text-[#6E5D4C] text-xs font-semibold uppercase tracking-wider">
             <BookOpen className="w-3.5 h-3.5 text-[#EA580C]" />
-            <span>{language === 'ko' ? '도서 무료 배포' : 'Free eBooks'}</span>
+            <span>{language === 'ko' ? `전자책 무료 배포 (총 ${books.length}종)` : `Free eBooks Collection (${books.length} Books)`}</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#1E1915] font-display">
             {language === 'ko' ? '진실을 알리는 무료 전자책 다운로드' : 'Download Free eBooks by Raël'}
@@ -46,59 +46,62 @@ export const BooksSection: React.FC = () => {
           </p>
         </div>
 
-        {/* Books Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Books Grid - Responsive 1 to 4 columns */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {books.map(book => (
             <div
               key={book.id}
-              className="bg-white rounded-2xl border border-[#E2D5C5] overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between text-left p-6 sm:p-7"
+              className="bg-white rounded-2xl border border-[#E2D5C5] overflow-hidden shadow-xs hover:shadow-md transition-all flex flex-col justify-between text-left p-5 sm:p-6 group hover:border-[#EA580C]/40"
             >
               <div className="space-y-4">
                 {/* Book Cover Visual */}
-                <div className="relative rounded-xl overflow-hidden shadow-md h-56 bg-stone-100 border border-[#DDD0C0]">
+                <div className="relative rounded-xl overflow-hidden shadow-sm h-60 bg-stone-100 border border-[#DDD0C0] group-hover:shadow-md transition-shadow">
                   <img
                     src={book.coverImage}
                     alt={book.title[language]}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     referrerPolicy="no-referrer"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=600&auto=format&fit=crop&q=80';
+                    }}
                   />
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-md bg-black/60 backdrop-blur-md text-white text-[11px] font-bold">
+                  <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded-md bg-black/65 backdrop-blur-md text-white text-[10px] font-bold tracking-wide">
                     FREE PDF
                   </div>
                 </div>
 
                 {/* Info */}
-                <div>
-                  <div className="text-xs font-bold text-[#EA580C] uppercase tracking-wider mb-1">
+                <div className="space-y-1.5">
+                  <div className="text-[11px] font-bold text-[#EA580C] uppercase tracking-wider">
                     {book.author}
                   </div>
-                  <h3 className="text-lg font-bold text-[#1E1915] font-display leading-snug">
+                  <h3 className="text-base font-bold text-[#1E1915] font-display leading-snug line-clamp-2">
                     {book.title[language]}
                   </h3>
-                  <p className="text-xs sm:text-sm text-[#665646] mt-2 leading-relaxed line-clamp-3">
+                  <p className="text-xs text-[#665646] leading-relaxed line-clamp-3">
                     {book.description[language]}
                   </p>
                 </div>
 
                 {/* Metadata Pills */}
-                <div className="flex flex-wrap gap-1.5 pt-2">
-                  <span className="text-[11px] bg-[#F4EDE3] text-[#5A4B3C] px-2.5 py-1 rounded-md font-medium">
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="text-[10px] bg-[#F4EDE3] text-[#5A4B3C] px-2 py-0.5 rounded-md font-medium">
                     {book.pageCount} {language === 'ko' ? '페이지' : 'pages'}
                   </span>
-                  <span className="text-[11px] bg-[#F4EDE3] text-[#5A4B3C] px-2.5 py-1 rounded-md font-medium">
+                  <span className="text-[10px] bg-[#F4EDE3] text-[#5A4B3C] px-2 py-0.5 rounded-md font-medium">
                     {book.languages.slice(0, 3).join(', ')}
                   </span>
                 </div>
               </div>
 
               {/* Download Action Button */}
-              <div className="pt-6 border-t border-[#EFE6DB] mt-6">
+              <div className="pt-4 border-t border-[#EFE6DB] mt-5">
                 <button
                   onClick={() => handleDownloadClick(book)}
-                  className="w-full py-3 rounded-xl text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs hover:opacity-95 transition-opacity cursor-pointer"
+                  className="w-full py-2.5 rounded-xl text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs hover:opacity-90 active:scale-[0.98] transition-all cursor-pointer"
                   style={{ backgroundColor: theme.accentColor }}
                 >
-                  <Download className="w-4 h-4" />
+                  <Download className="w-3.5 h-3.5" />
                   <span>{language === 'ko' ? '무료 PDF 다운로드' : 'Download Free PDF'}</span>
                 </button>
               </div>
