@@ -15,6 +15,7 @@ import { ArticleDetailModal } from './components/ArticleDetailModal';
 import { AdminModal } from './components/AdminModal';
 import { AdminLoginPage } from './components/AdminLoginPage';
 import { AdminTopBar } from './components/AdminTopBar';
+import { LiveChatWidget } from './components/LiveChatWidget';
 import { Settings } from 'lucide-react';
 
 const MainLayout: React.FC = () => {
@@ -63,20 +64,23 @@ const MainLayout: React.FC = () => {
       {/* Reader Modal */}
       <ArticleDetailModal />
 
+      {/* 24/7 Live Chat Floating Consultation Widget (Follows at bottom of screen) */}
+      <LiveChatWidget />
+
       {/* Admin Dashboard Modal (Protected: only renders if authenticated) */}
       {isAdminAuthenticated && <AdminModal />}
 
-      {/* Floating Quick Admin Toggle (Strictly visible ONLY to logged-in administrator) */}
+      {/* Floating Quick Admin Toggle (Strictly visible ONLY to logged-in administrator, positioned at bottom-left so it never blocks chat) */}
       {isAdminAuthenticated && (
-        <div className="fixed bottom-6 right-6 z-30">
+        <div className="fixed bottom-6 left-6 z-30">
           <button
             id="floating-admin-btn"
             onClick={() => setIsAdminOpen(true)}
             className="group flex items-center gap-2 px-4 py-3 rounded-full text-white font-semibold text-xs sm:text-sm shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 cursor-pointer border border-white/30 backdrop-blur-md"
-            style={{ backgroundColor: theme.accentColor }}
+            style={{ backgroundColor: '#1F1B18' }}
             title={language === 'ko' ? '관리자 대시보드 열기' : 'Open Admin Panel'}
           >
-            <Settings className="w-4 h-4 transition-transform group-hover:rotate-90 duration-300" />
+            <Settings className="w-4 h-4 transition-transform group-hover:rotate-90 duration-300 text-amber-400" />
             <span className="hidden sm:inline">
               {language === 'ko' ? '관리자 대시보드' : 'Admin Panel'}
             </span>

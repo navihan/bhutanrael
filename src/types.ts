@@ -187,6 +187,56 @@ export interface PhilosophyPillar {
   image: string;
 }
 
+export interface ChatMessage {
+  id: string;
+  sender: 'user' | 'agent' | 'system';
+  text: string;
+  timestamp: string;
+  status?: 'sent' | 'delivered' | 'read';
+  quickReplies?: string[];
+  inquiryDetails?: {
+    name?: string;
+    contact?: string;
+    category?: string;
+  };
+}
+
+export interface ChatInquiry {
+  id: string;
+  name: string;
+  contact: string;
+  category: string;
+  message: string;
+  createdAt: string;
+  status: 'pending' | 'in_progress' | 'resolved';
+  adminNotes?: string;
+  adminReply?: string;
+}
+
+export interface ChatConfig {
+  enabled: boolean;
+  counselorName: {
+    ko: string;
+    en: string;
+  };
+  counselorTitle: {
+    ko: string;
+    en: string;
+  };
+  welcomeMessage: {
+    ko: string;
+    en: string;
+  };
+  autoReplyEnabled: boolean;
+  operatingHours: {
+    ko: string;
+    en: string;
+  };
+  emergencyPhone: string;
+  emergencyEmail: string;
+  categories: string[];
+}
+
 export interface SiteState {
   theme: ThemeConfig;
   seo: SeoConfig;
@@ -196,4 +246,7 @@ export interface SiteState {
   books: BookItem[];
   philosophyPillars: PhilosophyPillar[];
   language: Language;
+  chatConfig?: ChatConfig;
+  chatInquiries?: ChatInquiry[];
 }
+

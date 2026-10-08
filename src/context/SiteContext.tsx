@@ -11,7 +11,9 @@ import {
   AdminRole,
   AdminUser,
   AdminInvite,
-  PhilosophyPillar
+  PhilosophyPillar,
+  ChatConfig,
+  ChatInquiry
 } from '../types';
 import {
   defaultTheme,
@@ -20,7 +22,9 @@ import {
   defaultPosts,
   defaultEvents,
   defaultBooks,
-  defaultPhilosophyPillars
+  defaultPhilosophyPillars,
+  defaultChatConfig,
+  defaultChatInquiries
 } from '../data/defaultData';
 
 interface SiteContextType {
@@ -32,6 +36,9 @@ interface SiteContextType {
   events: EventItem[];
   books: BookItem[];
   philosophyPillars: PhilosophyPillar[];
+  chatConfig: ChatConfig;
+  chatInquiries: ChatInquiry[];
+  isChatOpen: boolean;
   language: Language;
   isAdminOpen: boolean;
   isAdminAuthenticated: boolean;
@@ -57,6 +64,7 @@ interface SiteContextType {
   selectedEventForRsvp: EventItem | null;
   setLanguage: (lang: Language) => void;
   setIsAdminOpen: (open: boolean) => void;
+  setIsChatOpen: (open: boolean) => void;
   setSelectedPostForDetail: (post: Post | null) => void;
   setSelectedEventForRsvp: (event: EventItem | null) => void;
   updateTheme: (theme: Partial<ThemeConfig>) => void;
@@ -67,6 +75,11 @@ interface SiteContextType {
   updateBook: (book: BookItem) => void;
   deleteBook: (id: string) => void;
   resetBooksToDefault: () => void;
+  updateChatConfig: (config: Partial<ChatConfig>) => void;
+  addChatInquiry: (inquiry: Omit<ChatInquiry, 'id' | 'createdAt' | 'status'>) => ChatInquiry;
+  updateChatInquiryStatus: (id: string, status: ChatInquiry['status'], adminNotes?: string, adminReply?: string) => void;
+  deleteChatInquiry: (id: string) => void;
+  clearChatInquiries: () => void;
   addPost: (post: Omit<Post, 'id' | 'views'>) => Post;
   updatePost: (post: Post) => void;
   deletePost: (id: string) => void;
@@ -367,9 +380,30 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [currentPath, setCurrentPath] = useState<string>(getInitialPath);
   const [isAdminOpen, setIsAdminOpenState] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [editingPostTarget, setEditingPostTarget] = useState<Post | null>(null);
   const [selectedPostForDetail, setSelectedPostForDetail] = useState<Post | null>(null);
   const [selectedEventForRsvp, setSelectedEventForRsvp] = useState<EventItem | null>(null);
+
+  const [chatConfig, setChatConfig] = useState<ChatConfig>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY + '_chat_config');
+      if (saved) return JSON.parse(saved);
+      return defaultChatConfig;
+    } catch {
+      return defaultChatConfig;
+    }
+  });
+
+  const [chatInquiries, setChatInquiries] = useState<ChatInquiry[]>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY + '_chat_inquiries');
+      if (saved) return JSON.parse(saved);
+      return defaultChatInquiries;
+    } catch {
+      return defaultChatInquiries;
+    }
+  });
 
   // Auto-register from URL invite params if present on mount/route change
   useEffect(() => {
@@ -954,6 +988,80 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateChatConfig = (partial: Partial<ChatConfig>) => {
+    setChatConfig(prev => {
+      const next = { ...prev, ...partial };
+      try {
+        localStorage.setItem(STORAGE_KEY + '_chat_config', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save chat config to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  const addChatInquiry = (inquiryData: Omit<ChatInquiry, 'id' | 'createdAt' | 'status'>): ChatInquiry => {
+    const newInquiry: ChatInquiry = {
+      id: `inq-${Date.now()}`,
+      createdAt: new Date().toISOString().replace('T', ' ').slice(0, 16),
+      status: 'pending',
+      ...inquiryData
+    };
+    setChatInquiries(prev => {
+      const next = [newInquiry, ...prev];
+      try {
+        localStorage.setItem(STORAGE_KEY + '_chat_inquiries', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save chat inquiries to localStorage', e);
+      }
+      return next;
+    });
+    return newInquiry;
+  };
+
+  const updateChatInquiryStatus = (id: string, status: ChatInquiry['status'], adminNotes?: string, adminReply?: string) => {
+    setChatInquiries(prev => {
+      const next = prev.map(inq => {
+        if (inq.id === id) {
+          return {
+            ...inq,
+            status,
+            adminNotes: adminNotes !== undefined ? adminNotes : inq.adminNotes,
+            adminReply: adminReply !== undefined ? adminReply : inq.adminReply
+          };
+        }
+        return inq;
+      });
+      try {
+        localStorage.setItem(STORAGE_KEY + '_chat_inquiries', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save chat inquiries to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  const deleteChatInquiry = (id: string) => {
+    setChatInquiries(prev => {
+      const next = prev.filter(inq => inq.id !== id);
+      try {
+        localStorage.setItem(STORAGE_KEY + '_chat_inquiries', JSON.stringify(next));
+      } catch (e) {
+        console.warn('Failed to save chat inquiries to localStorage', e);
+      }
+      return next;
+    });
+  };
+
+  const clearChatInquiries = () => {
+    setChatInquiries([]);
+    try {
+      localStorage.setItem(STORAGE_KEY + '_chat_inquiries', JSON.stringify([]));
+    } catch (e) {
+      console.warn('Failed to save chat inquiries to localStorage', e);
+    }
+  };
+
   const resetToDefault = () => {
     setTheme(defaultTheme);
     setSeo(defaultSeo);
@@ -962,6 +1070,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setEvents(defaultEvents);
     setBooks(defaultBooks);
     setPhilosophyPillars(defaultPhilosophyPillars);
+    setChatConfig(defaultChatConfig);
+    setChatInquiries(defaultChatInquiries);
     localStorage.removeItem(STORAGE_KEY + '_theme');
     localStorage.removeItem(STORAGE_KEY + '_seo');
     localStorage.removeItem(STORAGE_KEY + '_content');
@@ -969,6 +1079,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem(STORAGE_KEY + '_events');
     localStorage.removeItem(STORAGE_KEY + '_books');
     localStorage.removeItem(STORAGE_KEY + '_pillars');
+    localStorage.removeItem(STORAGE_KEY + '_chat_config');
+    localStorage.removeItem(STORAGE_KEY + '_chat_inquiries');
   };
 
   const exportData = () => {
@@ -982,6 +1094,8 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       events,
       books,
       philosophyPillars,
+      chatConfig,
+      chatInquiries,
       adminUsers: adminUsers.map(({ password, ...rest }) => rest), // exclude raw passwords for security
       adminInvites
     };
@@ -1006,6 +1120,11 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (Array.isArray(parsed.events)) setEvents(parsed.events);
       if (Array.isArray(parsed.books)) updateBooks(parsed.books);
       if (Array.isArray(parsed.philosophyPillars)) updatePhilosophyPillars(parsed.philosophyPillars);
+      if (parsed.chatConfig) updateChatConfig(parsed.chatConfig);
+      if (Array.isArray(parsed.chatInquiries)) {
+        setChatInquiries(parsed.chatInquiries);
+        localStorage.setItem(STORAGE_KEY + '_chat_inquiries', JSON.stringify(parsed.chatInquiries));
+      }
       return true;
     } catch (err) {
       console.error('Failed to import backup data', err);
@@ -1021,7 +1140,9 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
     events,
     books,
     philosophyPillars,
-    language
+    language,
+    chatConfig,
+    chatInquiries
   };
 
   return (
@@ -1035,6 +1156,9 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         events,
         books,
         philosophyPillars,
+        chatConfig,
+        chatInquiries,
+        isChatOpen,
         language,
         isAdminOpen,
         isAdminAuthenticated,
@@ -1060,6 +1184,7 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         selectedEventForRsvp,
         setLanguage,
         setIsAdminOpen,
+        setIsChatOpen,
         setSelectedPostForDetail,
         setSelectedEventForRsvp,
         updateTheme,
@@ -1070,6 +1195,11 @@ export const SiteProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateBook,
         deleteBook,
         resetBooksToDefault,
+        updateChatConfig,
+        addChatInquiry,
+        updateChatInquiryStatus,
+        deleteChatInquiry,
+        clearChatInquiries,
         addPost,
         updatePost,
         deletePost,

@@ -29,12 +29,32 @@ import {
   UserPlus,
   Lock,
   Shield,
-  BookOpen
+  BookOpen,
+  MessageCircle,
+  Headphones,
+  PhoneCall,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Mail,
+  Filter,
+  Save,
+  LayoutDashboard,
+  BarChart3,
+  TrendingUp,
+  Activity,
+  CheckCircle2,
+  Send,
+  Inbox,
+  Zap,
+  ArrowUpRight,
+  MessageSquareQuote,
+  Settings
 } from 'lucide-react';
 import { ImageUploader } from './ImageUploader';
 import { AdminManagementTab } from './AdminManagementTab';
 
-type AdminTab = 'posts' | 'admins' | 'content' | 'philosophy' | 'books' | 'theme' | 'seo' | 'backup';
+type AdminTab = 'dashboard' | 'chat' | 'posts' | 'books' | 'admins' | 'content' | 'philosophy' | 'theme' | 'seo' | 'backup';
 
 export const AdminModal: React.FC = () => {
   const {
@@ -65,6 +85,13 @@ export const AdminModal: React.FC = () => {
     updateBook,
     deleteBook,
     resetBooksToDefault,
+    chatConfig,
+    updateChatConfig,
+    chatInquiries,
+    updateChatInquiryStatus,
+    deleteChatInquiry,
+    clearChatInquiries,
+    addChatInquiry,
     posts,
     addPost,
     updatePost,
@@ -79,7 +106,9 @@ export const AdminModal: React.FC = () => {
   const [newPasswordInput, setNewPasswordInput] = useState('');
   const [pwdFeedback, setPwdFeedback] = useState<string | null>(null);
 
-  const [activeTab, setActiveTab] = useState<AdminTab>('posts');
+  const [activeTab, setActiveTab] = useState<AdminTab>('dashboard');
+  const [dashboardInquiryFilter, setDashboardInquiryFilter] = useState<'all' | 'pending' | 'in_progress' | 'resolved'>('all');
+  const [dashboardReplyOpenId, setDashboardReplyOpenId] = useState<string | null>(null);
 
   // Author filter for posts tab
   const [postAuthorFilter, setPostAuthorFilter] = useState<'all' | 'mine'>('all');
@@ -115,8 +144,6 @@ export const AdminModal: React.FC = () => {
       setEditingPostTarget(null);
     }
   }, [editingPostTarget]);
-
-  if (!isAdminOpen) return null;
 
   const showNotification = (msg: string) => {
     setSaveSuccessMsg(msg);
@@ -305,6 +332,157 @@ export const AdminModal: React.FC = () => {
     }
   };
 
+  // Chat management state & handlers
+  const [chatInquiryFilter, setChatInquiryFilter] = useState<'all' | 'pending' | 'in_progress' | 'resolved'>('all');
+  const [chatSearchQuery, setChatSearchQuery] = useState('');
+  const [selectedInquiryForReply, setSelectedInquiryForReply] = useState<string | null>(null);
+  const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
+  const [noteDrafts, setNoteDrafts] = useState<Record<string, string>>({});
+
+  // Manual inquiry creation modal/drawer inside chat tab
+  const [isAddingManualInquiry, setIsAddingManualInquiry] = useState(false);
+  const [manualInquiryForm, setManualInquiryForm] = useState({
+    name: '',
+    contact: '',
+    category: chatConfig?.categories?.[0] || '엘로힘 메시지 안내',
+    message: '',
+    adminNotes: ''
+  });
+
+  // Chat settings form
+  const [chatConfigForm, setChatConfigForm] = useState({
+    enabled: chatConfig?.enabled ?? true,
+    counselorNameKo: chatConfig?.counselorName?.ko || '',
+    counselorNameEn: chatConfig?.counselorName?.en || '',
+    counselorTitleKo: chatConfig?.counselorTitle?.ko || '',
+    counselorTitleEn: chatConfig?.counselorTitle?.en || '',
+    welcomeKo: chatConfig?.welcomeMessage?.ko || '',
+    welcomeEn: chatConfig?.welcomeMessage?.en || '',
+    autoReplyEnabled: chatConfig?.autoReplyEnabled ?? true,
+    operatingHoursKo: chatConfig?.operatingHours?.ko || '',
+    operatingHoursEn: chatConfig?.operatingHours?.en || '',
+    emergencyPhone: chatConfig?.emergencyPhone || '',
+    emergencyEmail: chatConfig?.emergencyEmail || '',
+    categoriesStr: (chatConfig?.categories || []).join(', ')
+  });
+
+  const handleSaveChatConfig = () => {
+    const cats = chatConfigForm.categoriesStr
+      .split(',')
+      .map(c => c.trim())
+      .filter(c => c.length > 0);
+    updateChatConfig({
+      enabled: chatConfigForm.enabled,
+      counselorName: {
+        ko: chatConfigForm.counselorNameKo,
+        en: chatConfigForm.counselorNameEn
+      },
+      counselorTitle: {
+        ko: chatConfigForm.counselorTitleKo,
+        en: chatConfigForm.counselorTitleEn
+      },
+      welcomeMessage: {
+        ko: chatConfigForm.welcomeKo,
+        en: chatConfigForm.welcomeEn
+      },
+      autoReplyEnabled: chatConfigForm.autoReplyEnabled,
+      operatingHours: {
+        ko: chatConfigForm.operatingHoursKo,
+        en: chatConfigForm.operatingHoursEn
+      },
+      emergencyPhone: chatConfigForm.emergencyPhone,
+      emergencyEmail: chatConfigForm.emergencyEmail,
+      categories: cats.length > 0 ? cats : chatConfig?.categories
+    });
+    showNotification(language === 'ko' ? '24시간 채팅상담 환경 설정이 저장되었습니다.' : 'Chat settings saved successfully.');
+  };
+
+  const handleSaveInquiryReplyAndNote = (id: string, currentStatus: 'pending' | 'in_progress' | 'resolved') => {
+    const reply = replyDrafts[id];
+    const notes = noteDrafts[id];
+    const nextStatus = reply?.trim() ? 'resolved' : currentStatus;
+    updateChatInquiryStatus(id, nextStatus, notes, reply);
+    showNotification(language === 'ko' ? '상담 답변 및 관리자 메모가 저장되었습니다.' : 'Reply and notes saved.');
+    setSelectedInquiryForReply(null);
+  };
+
+  const handleCreateManualInquiry = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!manualInquiryForm.name.trim() || !manualInquiryForm.contact.trim() || !manualInquiryForm.message.trim()) {
+      alert(language === 'ko' ? '이름, 연락처, 상담 내용을 모두 입력해 주세요.' : 'Please fill all required fields.');
+      return;
+    }
+    const created = addChatInquiry({
+      name: manualInquiryForm.name.trim(),
+      contact: manualInquiryForm.contact.trim(),
+      category: manualInquiryForm.category,
+      message: manualInquiryForm.message.trim(),
+      adminNotes: manualInquiryForm.adminNotes.trim() || undefined
+    });
+    showNotification(language === 'ko' ? `상담 건(${created.id})이 직접 등록되었습니다.` : 'Inquiry added successfully.');
+    setIsAddingManualInquiry(false);
+    setManualInquiryForm({
+      name: '',
+      contact: '',
+      category: chatConfig?.categories?.[0] || '엘로힘 메시지 안내',
+      message: '',
+      adminNotes: ''
+    });
+  };
+
+  const handleDeleteInquiry = (id: string, name: string) => {
+    if (window.confirm(language === 'ko' ? `"${name}" 님의 상담 내역을 삭제하시겠습니까?` : `Delete inquiry from ${name}?`)) {
+      deleteChatInquiry(id);
+      showNotification(language === 'ko' ? '상담 내역이 삭제되었습니다.' : 'Inquiry deleted.');
+    }
+  };
+
+  const handleClearAllInquiries = () => {
+    if (window.confirm(language === 'ko' ? '모든 실시간 상담 문의 내역을 초기화하시겠습니까?' : 'Clear all chat inquiries?')) {
+      clearChatInquiries();
+      showNotification(language === 'ko' ? '모든 상담 내역이 초기화되었습니다.' : 'All inquiries cleared.');
+    }
+  };
+
+  const handleExportInquiries = () => {
+    const dataStr = JSON.stringify(chatInquiries, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `raelian_chat_inquiries_${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    showNotification(language === 'ko' ? '상담 내역 백업 파일이 다운로드되었습니다.' : 'Inquiries exported.');
+  };
+
+  const handleCreateSampleInquiry = () => {
+    const sample = addChatInquiry({
+      name: '김태형',
+      contact: '010-9876-5432',
+      category: '전자책 다운로드',
+      message: '새로 추가된 인간복제 및 각성으로의 여행 도서 PDF 다운로드 관련 문의드립니다. 태블릿에서도 바로 열람 가능한가요?',
+      adminNotes: '모바일 및 태블릿 다운로드 안내 완료'
+    });
+    showNotification(language === 'ko' ? `샘플 실시간 상담 문의(${sample.id})가 등록되었습니다.` : 'Sample inquiry created.');
+  };
+
+  const handleQuickStatusChange = (id: string, newStatus: 'pending' | 'in_progress' | 'resolved') => {
+    updateChatInquiryStatus(id, newStatus);
+    showNotification(language === 'ko' ? '상담 처리 상태가 업데이트되었습니다.' : 'Status updated.');
+  };
+
+  const handleToggleChatWidget = () => {
+    const nextState = !(chatConfig?.enabled ?? true);
+    updateChatConfig({ enabled: nextState });
+    setChatConfigForm(prev => ({ ...prev, enabled: nextState }));
+    showNotification(language === 'ko' 
+      ? (nextState ? '24시간 채팅상담 위젯이 활성화되었습니다 (온라인).' : '24시간 채팅상담 위젯이 일시 정지되었습니다 (오프라인).')
+      : (nextState ? 'Chat widget enabled.' : 'Chat widget paused.'));
+  };
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -419,6 +597,35 @@ export const AdminModal: React.FC = () => {
         {/* Tab Navigation Strip */}
         <div className="bg-[#EFE8DC] border-b border-[#D8CCBD] px-6 flex items-center gap-1 overflow-x-auto scrollbar-none">
           <button
+            onClick={() => { setActiveTab('dashboard'); setIsCreatingNewPost(false); setEditingPost(null); }}
+            className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'dashboard'
+                ? 'border-[#EA580C] text-[#EA580C] bg-[#FAF7F2]'
+                : 'border-transparent text-[#615142] hover:text-[#1E1915]'
+            }`}
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            <span>{language === 'ko' ? '종합 대시보드' : 'Dashboard'}</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('chat'); setIsCreatingNewPost(false); setEditingPost(null); }}
+            className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'chat'
+                ? 'border-[#EA580C] text-[#EA580C] bg-[#FAF7F2]'
+                : 'border-transparent text-[#615142] hover:text-[#1E1915]'
+            }`}
+          >
+            <MessageCircle className="w-4 h-4" />
+            <span>{language === 'ko' ? '24시간 채팅상담' : '24/7 Chat'}</span>
+            {chatInquiries.filter(i => i.status === 'pending').length > 0 && (
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-red-500 text-white animate-pulse">
+                {chatInquiries.filter(i => i.status === 'pending').length}
+              </span>
+            )}
+          </button>
+
+          <button
             onClick={() => { setActiveTab('posts'); setIsCreatingNewPost(false); setEditingPost(null); }}
             className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
               activeTab === 'posts'
@@ -428,6 +635,18 @@ export const AdminModal: React.FC = () => {
           >
             <FileText className="w-4 h-4" />
             <span>{language === 'ko' ? '게시글 관리' : 'Articles'} ({posts.length})</span>
+          </button>
+
+          <button
+            onClick={() => { setActiveTab('books'); setIsCreatingNewPost(false); setEditingPost(null); }}
+            className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
+              activeTab === 'books'
+                ? 'border-[#EA580C] text-[#EA580C] bg-[#FAF7F2]'
+                : 'border-transparent text-[#615142] hover:text-[#1E1915]'
+            }`}
+          >
+            <BookOpen className="w-4 h-4" />
+            <span>{language === 'ko' ? '무료 전자책 관리' : 'eBooks'} ({books?.length || 7})</span>
           </button>
 
           <button
@@ -464,18 +683,6 @@ export const AdminModal: React.FC = () => {
           >
             <Sparkles className="w-4 h-4" />
             <span>{language === 'ko' ? '5대 핵심 철학' : '5 Pillars'} ({philosophyPillars?.length || 5})</span>
-          </button>
-
-          <button
-            onClick={() => { setActiveTab('books'); setIsCreatingNewPost(false); setEditingPost(null); }}
-            className={`flex items-center gap-2 py-3 px-4 text-xs sm:text-sm font-semibold border-b-2 transition-all cursor-pointer whitespace-nowrap ${
-              activeTab === 'books'
-                ? 'border-[#EA580C] text-[#EA580C] bg-[#FAF7F2]'
-                : 'border-transparent text-[#615142] hover:text-[#1E1915]'
-            }`}
-          >
-            <BookOpen className="w-4 h-4" />
-            <span>{language === 'ko' ? '무료 전자책 관리' : 'eBooks'} ({books?.length || 7})</span>
           </button>
 
           <button
@@ -517,6 +724,702 @@ export const AdminModal: React.FC = () => {
 
         {/* Tab Body Contents */}
         <div className="p-6 sm:p-8 overflow-y-auto flex-1 space-y-6">
+
+          {/* TAB 0: COMPREHENSIVE DASHBOARD OVERVIEW */}
+          {activeTab === 'dashboard' && (
+            <div className="space-y-6 animate-in fade-in-50 duration-200">
+              
+              {/* 1. Welcome & Status Banner */}
+              <div className="bg-gradient-to-r from-[#2A221B] via-[#3D332B] to-[#2A221B] rounded-2xl p-6 text-white shadow-md border border-[#524439] relative overflow-hidden">
+                <div className="absolute right-0 top-0 w-96 h-full opacity-10 pointer-events-none bg-[radial-gradient(#EA580C_1px,transparent_1px)] [background-size:16px_16px]" />
+                
+                <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                  <div>
+                    <div className="flex flex-wrap items-center gap-2.5 mb-2">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#EA580C] text-white flex items-center gap-1.5 shadow-2xs">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        {currentAdmin?.role === 'super_admin' ? (language === 'ko' ? '최고 관리자 (Super Admin)' : 'Super Admin') : (language === 'ko' ? '운영 관리자 (Admin)' : 'Admin')}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-white/10 text-[#E8DFD3] border border-white/10">
+                        {currentAdmin?.email || adminUsername}
+                      </span>
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                        {language === 'ko' ? '시스템 정상 작동 중' : 'System Operational'}
+                      </span>
+                    </div>
+
+                    <h2 className="text-xl sm:text-2xl font-bold font-display tracking-tight text-white flex items-center gap-2">
+                      <span>{language === 'ko' ? `환영합니다, ${currentAdmin?.name || '최고 관리자'}님!` : `Welcome, ${currentAdmin?.name || 'Administrator'}!`}</span>
+                      <Sparkles className="w-5 h-5 text-[#EA580C]" />
+                    </h2>
+                    <p className="text-xs sm:text-sm text-[#D1C3B2] mt-1 max-w-2xl leading-relaxed">
+                      {language === 'ko'
+                        ? '부탄 라엘리안 무브먼트 공식 포털의 24시간 실시간 상담 현황, 무료 전자책 라이브러리(7권), 게시글 및 시스템 설정을 한눈에 모니터링하고 제어합니다.'
+                        : 'Unified control center for Bhutan Raelian Movement official portal: 24/7 live chat consultation, 7 free eBooks, articles, and system operations.'}
+                    </p>
+                  </div>
+
+                  {/* 24/7 Consultation Live Status Widget Toggle & Quick Nav */}
+                  <div className="bg-black/30 backdrop-blur-xs p-4 rounded-xl border border-white/10 flex flex-col gap-3 min-w-[280px]">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-3 h-3 rounded-full ${chatConfig?.enabled !== false ? 'bg-emerald-400 animate-pulse' : 'bg-rose-400'}`} />
+                        <span className="text-xs font-bold text-white">
+                          {language === 'ko' ? '24시간 실시간 상담' : '24/7 Live Chat'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleToggleChatWidget}
+                        className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1 ${
+                          chatConfig?.enabled !== false
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 hover:bg-emerald-500/30'
+                            : 'bg-rose-500/20 text-rose-300 border border-rose-400/40 hover:bg-rose-500/30'
+                        }`}
+                      >
+                        {chatConfig?.enabled !== false
+                          ? (language === 'ko' ? '온라인 가동 중' : 'Online')
+                          : (language === 'ko' ? '일시 정지됨' : 'Paused')}
+                      </button>
+                    </div>
+
+                    <div className="text-[11px] text-[#C4B5A5] flex items-center justify-between border-t border-white/10 pt-2">
+                      <span>{language === 'ko' ? '미답변 대기 문의' : 'Pending Inquiries'}</span>
+                      <span className={`font-bold px-2 py-0.5 rounded-full text-[10px] ${
+                        chatInquiries.filter(i => i.status === 'pending').length > 0
+                          ? 'bg-red-500 text-white animate-pulse'
+                          : 'bg-white/10 text-emerald-300'
+                      }`}>
+                        {chatInquiries.filter(i => i.status === 'pending').length} {language === 'ko' ? '건' : 'items'}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('chat')}
+                      className="w-full py-1.5 px-3 rounded-lg text-xs font-bold text-white bg-[#EA580C] hover:bg-[#D44D06] transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs"
+                    >
+                      <MessageCircle className="w-3.5 h-3.5" />
+                      <span>{language === 'ko' ? '실시간 상담 관리 열기' : 'Manage Live Chat'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Top Key Performance Indicators (KPIs) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                
+                {/* KPI 1: Live Chat Consultation */}
+                <div 
+                  onClick={() => setActiveTab('chat')}
+                  className="bg-white rounded-2xl border border-[#E4D8CB] p-5 shadow-xs hover:border-[#EA580C] hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#7A6B5B] uppercase tracking-wide">
+                      {language === 'ko' ? '24시간 채팅상담' : '24/7 Live Chat'}
+                    </span>
+                    <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#EA580C] flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-[#1E1915] font-display">
+                      {chatInquiries.length}
+                    </span>
+                    <span className="text-xs text-[#8C7A6B]">{language === 'ko' ? '건 접수' : 'inquiries'}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs pt-3 border-t border-[#F0E8DC]">
+                    <span className="text-amber-700 font-semibold flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" />
+                      {language === 'ko' ? '대기' : 'Pending'}: {chatInquiries.filter(i => i.status === 'pending').length}
+                    </span>
+                    <span className="text-emerald-700 font-semibold flex items-center gap-1">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      {language === 'ko' ? '완료' : 'Done'}: {chatInquiries.filter(i => i.status === 'resolved').length}
+                    </span>
+                  </div>
+                </div>
+
+                {/* KPI 2: Free eBooks Library */}
+                <div 
+                  onClick={() => setActiveTab('books')}
+                  className="bg-white rounded-2xl border border-[#E4D8CB] p-5 shadow-xs hover:border-[#EA580C] hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#7A6B5B] uppercase tracking-wide">
+                      {language === 'ko' ? '무료 전자책 라이브러리' : 'Free eBooks'}
+                    </span>
+                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-[#1E1915] font-display">
+                      {books?.length || 7}
+                    </span>
+                    <span className="text-xs text-[#8C7A6B]">{language === 'ko' ? '권 등록 배포 중' : 'books active'}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs pt-3 border-t border-[#F0E8DC]">
+                    <span className="text-indigo-700 font-semibold">
+                      {language === 'ko' ? '신규 도서 4권 포함' : '+4 New Releases'}
+                    </span>
+                    <span className="text-[#8C7A6B]">
+                      {language === 'ko' ? '무료 PDF/Epub' : 'Free Download'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* KPI 3: Published Articles */}
+                <div 
+                  onClick={() => setActiveTab('posts')}
+                  className="bg-white rounded-2xl border border-[#E4D8CB] p-5 shadow-xs hover:border-[#EA580C] hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#7A6B5B] uppercase tracking-wide">
+                      {language === 'ko' ? '게시글 & 아티클' : 'Published Articles'}
+                    </span>
+                    <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-[#1E1915] font-display">
+                      {posts.length}
+                    </span>
+                    <span className="text-xs text-[#8C7A6B]">{language === 'ko' ? '편 발행' : 'articles'}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs pt-3 border-t border-[#F0E8DC]">
+                    <span className="text-blue-700 font-semibold">
+                      {language === 'ko' ? `추천글 ${posts.filter(p => p.isFeatured).length}편` : `${posts.filter(p => p.isFeatured).length} Featured`}
+                    </span>
+                    <span className="text-[#8C7A6B]">
+                      {language === 'ko' ? '정상 게시 중' : 'Live'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* KPI 4: Admins Team */}
+                <div 
+                  onClick={() => setActiveTab('admins')}
+                  className="bg-white rounded-2xl border border-[#E4D8CB] p-5 shadow-xs hover:border-[#EA580C] hover:shadow-md transition-all cursor-pointer group"
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#7A6B5B] uppercase tracking-wide">
+                      {language === 'ko' ? '관리자 팀' : 'Admin Team'}
+                    </span>
+                    <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Users className="w-5 h-5" />
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-2">
+                    <span className="text-3xl font-extrabold text-[#1E1915] font-display">
+                      {adminUsers.length}
+                    </span>
+                    <span className="text-xs text-[#8C7A6B]">{language === 'ko' ? '명 활성화' : 'admins'}</span>
+                  </div>
+                  <div className="mt-3 flex items-center justify-between text-xs pt-3 border-t border-[#F0E8DC]">
+                    <span className="text-purple-700 font-semibold">
+                      {currentAdmin?.role === 'super_admin' ? (language === 'ko' ? '최고 관리 권한' : 'Super Admin') : (language === 'ko' ? '일반 관리 권한' : 'Admin')}
+                    </span>
+                    <span className="text-[#8C7A6B]">
+                      {language === 'ko' ? '초대 & 권한' : 'Invites'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. Real-Time 24/7 Chat Consultation Control Desk */}
+              <div className="bg-white rounded-2xl border border-[#E5DACD] shadow-xs overflow-hidden">
+                <div className="p-5 sm:p-6 border-b border-[#F0E8DC] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#EA580C] animate-pulse" />
+                      <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display">
+                        {language === 'ko' ? '24시간 실시간 채팅상담 현황 & 신속 응대 데스크' : '24/7 Live Chat Consultation Desk'}
+                      </h3>
+                      {chatInquiries.filter(i => i.status === 'pending').length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white animate-bounce">
+                          {chatInquiries.filter(i => i.status === 'pending').length}건 대기
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-[#7A6B5B] mt-1">
+                      {language === 'ko'
+                        ? '홈페이지 우측 하단 24시간 실시간 상담 위젯에서 접수된 방문자의 문의 내역을 즉시 확인하고 상태 변경 및 신속 답변을 발송합니다.'
+                        : 'Review inquiries received from the persistent 24/7 floating chat widget and respond immediately.'}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    {/* Status Filter Buttons */}
+                    <div className="flex bg-[#F5EFEB] p-1 rounded-xl border border-[#E2D5C7]">
+                      {(['all', 'pending', 'in_progress', 'resolved'] as const).map(filter => (
+                        <button
+                          key={filter}
+                          type="button"
+                          onClick={() => setDashboardInquiryFilter(filter)}
+                          className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer ${
+                            dashboardInquiryFilter === filter
+                              ? 'bg-white text-[#EA580C] shadow-2xs font-bold'
+                              : 'text-[#6B5A4A] hover:text-[#1E1915]'
+                          }`}
+                        >
+                          {filter === 'all' && (language === 'ko' ? `전체 (${chatInquiries.length})` : `All (${chatInquiries.length})`)}
+                          {filter === 'pending' && (language === 'ko' ? `대기 (${chatInquiries.filter(i => i.status === 'pending').length})` : `Pending (${chatInquiries.filter(i => i.status === 'pending').length})`)}
+                          {filter === 'in_progress' && (language === 'ko' ? `진행 (${chatInquiries.filter(i => i.status === 'in_progress').length})` : `In Progress (${chatInquiries.filter(i => i.status === 'in_progress').length})`)}
+                          {filter === 'resolved' && (language === 'ko' ? `완료 (${chatInquiries.filter(i => i.status === 'resolved').length})` : `Resolved (${chatInquiries.filter(i => i.status === 'resolved').length})`)}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('chat')}
+                      className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-[#EA580C] hover:bg-[#D44D06] transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <span>{language === 'ko' ? '전체 상담 탭으로 이동' : 'Open Full Chat Tab'}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Inquiry Cards in Dashboard */}
+                <div className="p-5 sm:p-6 space-y-4">
+                  {chatInquiries.length === 0 ? (
+                    <div className="text-center py-12 px-4 bg-[#FCFAF7] rounded-xl border border-dashed border-[#DDD0C0]">
+                      <Inbox className="w-10 h-10 text-[#C4B5A5] mx-auto mb-3" />
+                      <h4 className="text-sm font-bold text-[#1E1915]">
+                        {language === 'ko' ? '접수된 실시간 상담 내역이 없습니다' : 'No chat inquiries yet'}
+                      </h4>
+                      <p className="text-xs text-[#8C7A6B] mt-1 max-w-md mx-auto">
+                        {language === 'ko'
+                          ? '웹사이트 메인 하단에 24시간 실시간 상담 위젯이 활성화되어 있으며, 방문자가 문의를 등록하면 즉시 이곳에 표시됩니다.'
+                          : 'The 24/7 chat widget is active at the bottom right. Inquiries submitted by visitors will appear here.'}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={handleCreateSampleInquiry}
+                        className="mt-4 px-4 py-2 rounded-xl text-xs font-bold text-white bg-[#EA580C] hover:bg-[#D44D06] transition-colors cursor-pointer inline-flex items-center gap-1.5 shadow-2xs"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>{language === 'ko' ? '테스트 실시간 문의 생성하기' : 'Create Sample Inquiry'}</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {chatInquiries
+                        .filter(inq => {
+                          if (dashboardInquiryFilter === 'all') return true;
+                          return inq.status === dashboardInquiryFilter;
+                        })
+                        .slice(0, 5)
+                        .map(inq => (
+                          <div 
+                            key={inq.id}
+                            className={`p-4 rounded-xl border transition-all ${
+                              inq.status === 'pending'
+                                ? 'bg-amber-50/40 border-amber-200'
+                                : inq.status === 'in_progress'
+                                ? 'bg-blue-50/40 border-blue-200'
+                                : 'bg-white border-[#E8DFD3]'
+                            }`}
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-[#F2ECE2]">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="font-bold text-sm text-[#1E1915] flex items-center gap-1.5">
+                                  {inq.name}
+                                </span>
+                                <span className="text-xs text-[#8C7A6B] px-2 py-0.5 rounded-full bg-[#EFE8DC]">
+                                  {inq.contact}
+                                </span>
+                                <span className="text-[11px] font-semibold text-[#EA580C] px-2 py-0.5 rounded-full bg-[#EA580C]/10">
+                                  {inq.category}
+                                </span>
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <span className="text-[11px] text-[#A69584]">
+                                  {new Date(inq.createdAt).toLocaleString(language === 'ko' ? 'ko-KR' : 'en-US', {
+                                    month: 'numeric',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+
+                                {/* Status Badge */}
+                                <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 ${
+                                  inq.status === 'pending'
+                                    ? 'bg-amber-100 text-amber-800 border border-amber-300'
+                                    : inq.status === 'in_progress'
+                                    ? 'bg-blue-100 text-blue-800 border border-blue-300'
+                                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                                }`}>
+                                  {inq.status === 'pending' && <Clock className="w-3 h-3" />}
+                                  {inq.status === 'in_progress' && <AlertCircle className="w-3 h-3" />}
+                                  {inq.status === 'resolved' && <CheckCircle className="w-3 h-3" />}
+                                  {inq.status === 'pending' && (language === 'ko' ? '접수 대기' : 'Pending')}
+                                  {inq.status === 'in_progress' && (language === 'ko' ? '상담 진행중' : 'In Progress')}
+                                  {inq.status === 'resolved' && (language === 'ko' ? '답변 완료' : 'Resolved')}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Visitor Inquiry Message */}
+                            <div className="mt-3 text-xs text-[#3D3126] leading-relaxed bg-[#FAF6F0] p-3 rounded-lg border border-[#EDE3D6]">
+                              <span className="font-bold text-[#8C7A6B] block mb-1">
+                                {language === 'ko' ? '문의 내용:' : 'Inquiry:'}
+                              </span>
+                              {inq.message}
+                            </div>
+
+                            {/* Official Admin Reply if exists */}
+                            {inq.adminReply && (
+                              <div className="mt-2 text-xs text-[#1E3A2F] leading-relaxed bg-emerald-50/70 p-3 rounded-lg border border-emerald-200">
+                                <span className="font-bold text-emerald-800 flex items-center gap-1 mb-1">
+                                  <CheckCircle className="w-3.5 h-3.5" />
+                                  {language === 'ko' ? '라엘리안 상담원 공식 답변:' : 'Counselor Reply:'}
+                                </span>
+                                {inq.adminReply}
+                              </div>
+                            )}
+
+                            {/* Inline Reply Box if open */}
+                            {dashboardReplyOpenId === inq.id && (
+                              <div className="mt-3 p-3 bg-white rounded-lg border-2 border-[#EA580C]/40 space-y-2">
+                                <label className="block text-xs font-bold text-[#3B2F24]">
+                                  {language === 'ko' ? '상담원 공식 답변 작성' : 'Write Official Reply'}
+                                </label>
+                                <textarea
+                                  rows={3}
+                                  value={replyDrafts[inq.id] || ''}
+                                  onChange={e => setReplyDrafts({ ...replyDrafts, [inq.id]: e.target.value })}
+                                  placeholder={language === 'ko' ? '방문자에게 전달할 답변을 작성하세요. 저장 시 자동으로 완료 처리됩니다.' : 'Type your answer here...'}
+                                  className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-lg font-sans"
+                                />
+                                <div className="flex items-center justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => setDashboardReplyOpenId(null)}
+                                    className="px-2.5 py-1 text-xs text-[#7A6B5B] hover:text-[#1E1915] cursor-pointer"
+                                  >
+                                    {language === 'ko' ? '취소' : 'Cancel'}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      handleSaveInquiryReplyAndNote(inq.id, inq.status);
+                                      setDashboardReplyOpenId(null);
+                                    }}
+                                    className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-[#EA580C] hover:bg-[#D44D06] cursor-pointer flex items-center gap-1"
+                                  >
+                                    <Send className="w-3 h-3" />
+                                    <span>{language === 'ko' ? '답변 저장 및 완료 처리' : 'Save & Resolve'}</span>
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Action Buttons for this inquiry */}
+                            <div className="mt-3 flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-[#F2ECE2]">
+                              <div className="flex flex-wrap items-center gap-1.5">
+                                <span className="text-[11px] text-[#8C7A6B] mr-1">{language === 'ko' ? '빠른 상태 변경:' : 'Quick Status:'}</span>
+                                {inq.status !== 'in_progress' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(inq.id, 'in_progress')}
+                                    className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors cursor-pointer"
+                                  >
+                                    {language === 'ko' ? '진행중으로' : 'Mark In Progress'}
+                                  </button>
+                                )}
+                                {inq.status !== 'resolved' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(inq.id, 'resolved')}
+                                    className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors cursor-pointer"
+                                  >
+                                    {language === 'ko' ? '완료 처리' : 'Mark Resolved'}
+                                  </button>
+                                )}
+                                {inq.status !== 'pending' && (
+                                  <button
+                                    type="button"
+                                    onClick={() => handleQuickStatusChange(inq.id, 'pending')}
+                                    className="px-2.5 py-1 rounded-md text-[11px] font-semibold bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors cursor-pointer"
+                                  >
+                                    {language === 'ko' ? '대기 상태로' : 'Mark Pending'}
+                                  </button>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (dashboardReplyOpenId === inq.id) {
+                                      setDashboardReplyOpenId(null);
+                                    } else {
+                                      setDashboardReplyOpenId(inq.id);
+                                      if (!replyDrafts[inq.id] && inq.adminReply) {
+                                        setReplyDrafts({ ...replyDrafts, [inq.id]: inq.adminReply });
+                                      }
+                                    }
+                                  }}
+                                  className="px-2.5 py-1 rounded-lg text-xs font-bold text-[#EA580C] bg-[#EA580C]/10 hover:bg-[#EA580C]/20 transition-colors cursor-pointer flex items-center gap-1"
+                                >
+                                  <MessageSquareQuote className="w-3.5 h-3.5" />
+                                  <span>{inq.adminReply ? (language === 'ko' ? '답변 수정' : 'Edit Reply') : (language === 'ko' ? '즉시 답변 작성' : 'Quick Reply')}</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteInquiry(inq.id, inq.name)}
+                                  className="p-1 rounded-md text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
+                                  title="문의 삭제"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+
+                  {/* Counselor Info & Config Card */}
+                  <div className="mt-4 p-4 rounded-xl bg-[#FAF6F0] border border-[#E8DFD3] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-[#EA580C]/10 text-[#EA580C] flex items-center justify-center shrink-0">
+                        <Headphones className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="font-bold text-[#1E1915]">
+                          {chatConfig?.counselorName?.ko || '수석 라엘리안 가이드'} ({chatConfig?.counselorTitle?.ko || '24시간 안내 센터'})
+                        </div>
+                        <div className="text-[#7A6B5B] text-[11px] mt-0.5">
+                          {language === 'ko' ? '운영 안내:' : 'Hours:'} {chatConfig?.operatingHours?.ko || '연중무휴 24시간 실시간 상담 운영'} | 직통: {chatConfig?.emergencyPhone || '010-8740-4211'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('chat')}
+                      className="px-3 py-1.5 rounded-lg border border-[#DDD0C0] bg-white text-[#524439] hover:bg-[#F2EAE0] font-semibold transition-colors cursor-pointer shrink-0 flex items-center gap-1.5"
+                    >
+                      <span>{language === 'ko' ? '상담원 설정 편집' : 'Edit Settings'}</span>
+                      <Settings className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* 4. Free eBooks Library Distribution Overview (7 Books) */}
+              <div className="bg-white rounded-2xl border border-[#E5DACD] shadow-xs overflow-hidden">
+                <div className="p-5 sm:p-6 border-b border-[#F0E8DC] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-amber-600" />
+                      <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display">
+                        {language === 'ko' ? '무료 전자책 라이브러리 배포 현황 (총 7권 전권)' : 'Free eBooks Distribution Status (7 Books)'}
+                      </h3>
+                    </div>
+                    <p className="text-xs text-[#7A6B5B] mt-1">
+                      {language === 'ko'
+                        ? '홈페이지 "무료 전자책 다운로드" 섹션에 전시된 7권 도서 목록이며, PDF 및 EPUB 무료 다운로드가 100% 정상 가동 중입니다.'
+                        : 'Review the 7 free eBooks available for instant download in the eBooks section.'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setActiveTab('books'); setIsCreatingNewBook(true); }}
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 transition-colors cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>{language === 'ko' ? '도서 추가' : 'Add Book'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('books')}
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-[#DDD0C0] bg-white text-[#524439] hover:bg-[#F2EAE0] transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <span>{language === 'ko' ? '도서 전체 관리' : 'Manage eBooks'}</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-5 sm:p-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
+                    {books.map((book, idx) => (
+                      <div 
+                        key={book.id}
+                        onClick={() => {
+                          setActiveTab('books');
+                          handleStartEditBook(book);
+                        }}
+                        className="bg-[#FCFAF7] rounded-xl border border-[#EADBCC] p-2.5 hover:border-[#EA580C] hover:shadow-xs transition-all cursor-pointer flex flex-col justify-between group"
+                      >
+                        <div>
+                          <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-[#2A221B] mb-2 shadow-2xs">
+                            <img 
+                              src={book.coverImage} 
+                              alt={book.titleKo} 
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                            />
+                            {idx >= 3 && (
+                              <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-md bg-[#EA580C] text-white text-[9px] font-bold">
+                                {language === 'ko' ? '신규' : 'New'}
+                              </span>
+                            )}
+                          </div>
+                          <div className="font-bold text-xs text-[#1E1915] line-clamp-1 group-hover:text-[#EA580C] transition-colors">
+                            {language === 'ko' ? book.titleKo : book.titleEn}
+                          </div>
+                          <div className="text-[10px] text-[#8C7A6B] mt-0.5 line-clamp-1">
+                            {book.author}
+                          </div>
+                        </div>
+
+                        <div className="mt-2 pt-2 border-t border-[#EDE3D6] flex items-center justify-between text-[10px]">
+                          <span className="text-emerald-700 font-semibold flex items-center gap-0.5">
+                            <Check className="w-3 h-3" />
+                            PDF
+                          </span>
+                          <span className="text-[#8C7A6B]">{book.category}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* 5. Quick Operations Hub */}
+              <div className="bg-white rounded-2xl border border-[#E5DACD] p-5 sm:p-6 shadow-xs">
+                <div className="flex items-center justify-between border-b border-[#F0E8DC] pb-4 mb-4">
+                  <div className="flex items-center gap-2">
+                    <Zap className="w-5 h-5 text-[#EA580C]" />
+                    <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display">
+                      {language === 'ko' ? '관리자 신속 제어 허브 (Quick Action Hub)' : 'Quick Action Hub'}
+                    </h3>
+                  </div>
+                  <span className="text-xs text-[#8C7A6B]">
+                    {language === 'ko' ? '자주 사용하는 관리 기능 원클릭 실행' : 'One-click shortcuts'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {/* Action 1: Chat */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('chat')}
+                    className="p-4 rounded-xl border border-[#E5DACD] bg-[#FCFAF7] hover:bg-[#FAF4EC] hover:border-[#EA580C] transition-all cursor-pointer flex flex-col items-center text-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-orange-100 text-[#EA580C] flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <MessageCircle className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#1E1915]">
+                      {language === 'ko' ? '24시간 채팅상담' : '24/7 Live Chat'}
+                    </span>
+                    <span className="text-[10px] text-[#8C7A6B] mt-1">
+                      {language === 'ko' ? '실시간 문의 응대' : 'Answer Inquiries'}
+                    </span>
+                  </button>
+
+                  {/* Action 2: Posts */}
+                  <button
+                    type="button"
+                    onClick={() => { setActiveTab('posts'); setIsCreatingNewPost(true); }}
+                    className="p-4 rounded-xl border border-[#E5DACD] bg-[#FCFAF7] hover:bg-[#FAF4EC] hover:border-[#EA580C] transition-all cursor-pointer flex flex-col items-center text-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <Plus className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#1E1915]">
+                      {language === 'ko' ? '새 게시글 작성' : 'New Article'}
+                    </span>
+                    <span className="text-[10px] text-[#8C7A6B] mt-1">
+                      {language === 'ko' ? '공지 및 뉴스 등록' : 'Publish News'}
+                    </span>
+                  </button>
+
+                  {/* Action 3: Books */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('books')}
+                    className="p-4 rounded-xl border border-[#E5DACD] bg-[#FCFAF7] hover:bg-[#FAF4EC] hover:border-[#EA580C] transition-all cursor-pointer flex flex-col items-center text-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <BookOpen className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#1E1915]">
+                      {language === 'ko' ? '무료 전자책 관리' : 'Manage eBooks'}
+                    </span>
+                    <span className="text-[10px] text-[#8C7A6B] mt-1">
+                      {language === 'ko' ? '7권 도서 및 다운로드' : '7 Free Books'}
+                    </span>
+                  </button>
+
+                  {/* Action 4: Admins */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('admins')}
+                    className="p-4 rounded-xl border border-[#E5DACD] bg-[#FCFAF7] hover:bg-[#FAF4EC] hover:border-[#EA580C] transition-all cursor-pointer flex flex-col items-center text-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <Users className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#1E1915]">
+                      {language === 'ko' ? '관리자 팀 & 초대' : 'Admin Team'}
+                    </span>
+                    <span className="text-[10px] text-[#8C7A6B] mt-1">
+                      {language === 'ko' ? '운영자 권한 설정' : 'Invites & Roles'}
+                    </span>
+                  </button>
+
+                  {/* Action 5: Theme */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('theme')}
+                    className="p-4 rounded-xl border border-[#E5DACD] bg-[#FCFAF7] hover:bg-[#FAF4EC] hover:border-[#EA580C] transition-all cursor-pointer flex flex-col items-center text-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-pink-100 text-pink-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <Palette className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#1E1915]">
+                      {language === 'ko' ? '디자인 & 테마' : 'Theme Settings'}
+                    </span>
+                    <span className="text-[10px] text-[#8C7A6B] mt-1">
+                      {language === 'ko' ? '컬러 및 스타일' : 'Visual Branding'}
+                    </span>
+                  </button>
+
+                  {/* Action 6: Backup */}
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('backup')}
+                    className="p-4 rounded-xl border border-[#E5DACD] bg-[#FCFAF7] hover:bg-[#FAF4EC] hover:border-[#EA580C] transition-all cursor-pointer flex flex-col items-center text-center group"
+                  >
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                      <Database className="w-5 h-5" />
+                    </div>
+                    <span className="text-xs font-bold text-[#1E1915]">
+                      {language === 'ko' ? '백업 & 초기화' : 'Backup & Reset'}
+                    </span>
+                    <span className="text-[10px] text-[#8C7A6B] mt-1">
+                      {language === 'ko' ? 'JSON 백업 내보내기' : 'JSON Export'}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          )}
 
           {/* TAB 1: POST MANAGEMENT */}
           {activeTab === 'posts' && (
@@ -1745,6 +2648,611 @@ export const AdminModal: React.FC = () => {
               </div>
             </div>
           )}
+          {/* TAB: 24/7 LIVE CHAT & INQUIRIES MANAGEMENT */}
+          {activeTab === 'chat' && (
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8DFD3] pb-4">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#EA580C]/10 text-[#EA580C] uppercase tracking-wider flex items-center gap-1">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      24/7 Live Consultation
+                    </span>
+                    <h3 className="text-base sm:text-lg font-bold text-[#1E1915] font-display">
+                      {language === 'ko' ? '24시간 채팅상담 & 접수 문의 관리' : '24/7 Live Chat & Inquiries Dashboard'}
+                    </h3>
+                  </div>
+                  <p className="text-xs text-[#7A6B5B] mt-1">
+                    {language === 'ko'
+                      ? '웹사이트 우측 하단 24시간 상담 위젯을 통해 접수된 실시간 상담 내역을 확인하고 답변 상태를 관리하며, 상담원 프로필 및 자동 응답 설정을 구성합니다.'
+                      : 'Review customer inquiries from the persistent 24/7 floating chat widget, manage response statuses, and customize counselor settings.'}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => setIsAddingManualInquiry(true)}
+                    className="px-3 py-2 rounded-xl text-white text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-1.5"
+                    style={{ backgroundColor: theme.accentColor }}
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>{language === 'ko' ? '상담 직접 등록' : 'New Inquiry'}</span>
+                  </button>
+
+                  <button
+                    onClick={handleExportInquiries}
+                    className="px-3 py-2 rounded-xl border border-[#DDD0C0] text-[#6B5A4A] hover:bg-[#F2EAE0] text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1.5"
+                    title="JSON 백업"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    <span>{language === 'ko' ? '백업 내보내기' : 'Export'}</span>
+                  </button>
+
+                  {chatInquiries.length > 0 && (
+                    <button
+                      onClick={handleClearAllInquiries}
+                      className="px-3 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-xs font-semibold cursor-pointer transition-colors flex items-center gap-1.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>{language === 'ko' ? '전체 초기화' : 'Clear All'}</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Quick Stats Grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-white rounded-xl border border-[#E5DACD] p-3.5 shadow-xs">
+                  <div className="text-[11px] font-bold text-[#7A6B5B] uppercase tracking-wide">
+                    {language === 'ko' ? '전체 문의' : 'Total'}
+                  </div>
+                  <div className="text-2xl font-bold text-[#1E1915] mt-1">
+                    {chatInquiries.length}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-amber-200 bg-amber-50/40 p-3.5 shadow-xs">
+                  <div className="text-[11px] font-bold text-amber-700 uppercase tracking-wide flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    {language === 'ko' ? '접수 대기' : 'Pending'}
+                  </div>
+                  <div className="text-2xl font-bold text-amber-900 mt-1">
+                    {chatInquiries.filter(i => i.status === 'pending').length}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-blue-200 bg-blue-50/40 p-3.5 shadow-xs">
+                  <div className="text-[11px] font-bold text-blue-700 uppercase tracking-wide flex items-center gap-1">
+                    <AlertCircle className="w-3 h-3" />
+                    {language === 'ko' ? '상담 진행중' : 'In Progress'}
+                  </div>
+                  <div className="text-2xl font-bold text-blue-900 mt-1">
+                    {chatInquiries.filter(i => i.status === 'in_progress').length}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl border border-emerald-200 bg-emerald-50/40 p-3.5 shadow-xs">
+                  <div className="text-[11px] font-bold text-emerald-700 uppercase tracking-wide flex items-center gap-1">
+                    <CheckCircle className="w-3 h-3" />
+                    {language === 'ko' ? '상담 완료' : 'Resolved'}
+                  </div>
+                  <div className="text-2xl font-bold text-emerald-900 mt-1">
+                    {chatInquiries.filter(i => i.status === 'resolved').length}
+                  </div>
+                </div>
+              </div>
+
+              {/* Manual Inquiry Drawer / Form if open */}
+              {isAddingManualInquiry && (
+                <div className="bg-white rounded-2xl border-2 border-[#EA580C]/40 p-5 sm:p-6 shadow-md space-y-4 animate-in fade-in-50 duration-150">
+                  <div className="flex items-center justify-between border-b border-[#F0E8DC] pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-[#EA580C]" />
+                      <h4 className="text-sm sm:text-base font-bold text-[#1E1915]">
+                        {language === 'ko' ? '새 상담 문의 직접 등록' : 'Register Manual Inquiry'}
+                      </h4>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingManualInquiry(false)}
+                      className="p-1 rounded-lg text-[#8C7A6B] hover:bg-[#F2ECE2] cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleCreateManualInquiry} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '방문자 / 신청자 성명 *' : 'Visitor Name *'}
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualInquiryForm.name}
+                          onChange={(e) => setManualInquiryForm({ ...manualInquiryForm, name: e.target.value })}
+                          placeholder="예: 김상현"
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '연락처 (전화 또는 이메일) *' : 'Contact (Phone / Email) *'}
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={manualInquiryForm.contact}
+                          onChange={(e) => setManualInquiryForm({ ...manualInquiryForm, contact: e.target.value })}
+                          placeholder="010-0000-0000 또는 email@domain.com"
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '상담 분야' : 'Category'}
+                        </label>
+                        <select
+                          value={manualInquiryForm.category}
+                          onChange={(e) => setManualInquiryForm({ ...manualInquiryForm, category: e.target.value })}
+                          className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        >
+                          {(chatConfig?.categories || ['엘로힘 메시지 안내', '전자책 다운로드', '대사관 건설 프로젝트', '명상 아카데미 안내', '일반 문의']).map((cat) => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                        {language === 'ko' ? '상담 문의 내용 *' : 'Inquiry Message *'}
+                      </label>
+                      <textarea
+                        rows={3}
+                        required
+                        value={manualInquiryForm.message}
+                        onChange={(e) => setManualInquiryForm({ ...manualInquiryForm, message: e.target.value })}
+                        placeholder="상담 문의 내용을 상세히 기재하세요."
+                        className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                        {language === 'ko' ? '관리자 내부 메모 (선택사항)' : 'Admin Internal Note (Optional)'}
+                      </label>
+                      <input
+                        type="text"
+                        value={manualInquiryForm.adminNotes}
+                        onChange={(e) => setManualInquiryForm({ ...manualInquiryForm, adminNotes: e.target.value })}
+                        placeholder="예: 전화상담 완료 후 이메일로 전자책 추가 안내 예정"
+                        className="w-full px-3 py-2 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2 border-t border-[#F0E8DC]">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingManualInquiry(false)}
+                        className="px-4 py-2 rounded-xl border border-[#DDD0C0] text-[#6B5A4A] text-xs font-semibold cursor-pointer"
+                      >
+                        {language === 'ko' ? '취소' : 'Cancel'}
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 py-2 rounded-xl text-white text-xs font-semibold shadow-xs cursor-pointer"
+                        style={{ backgroundColor: theme.accentColor }}
+                      >
+                        {language === 'ko' ? '상담 등록 완료' : 'Save Inquiry'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              {/* Layout Split: Left (Inquiries List), Right (Chat Settings) */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Left 2 cols: Inquiries List */}
+                <div className="lg:col-span-2 space-y-4">
+                  {/* Filters & Search */}
+                  <div className="bg-white rounded-xl border border-[#E5DACD] p-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div className="flex items-center gap-1 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+                      {(['all', 'pending', 'in_progress', 'resolved'] as const).map((filterKey) => {
+                        const labels = {
+                          all: language === 'ko' ? '전체' : 'All',
+                          pending: language === 'ko' ? '대기중' : 'Pending',
+                          in_progress: language === 'ko' ? '진행중' : 'In Progress',
+                          resolved: language === 'ko' ? '완료' : 'Resolved'
+                        };
+                        const count = filterKey === 'all' 
+                          ? chatInquiries.length 
+                          : chatInquiries.filter(i => i.status === filterKey).length;
+                        return (
+                          <button
+                            key={filterKey}
+                            onClick={() => setChatInquiryFilter(filterKey)}
+                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap flex items-center gap-1.5 ${
+                              chatInquiryFilter === filterKey
+                                ? 'bg-[#1E1915] text-white shadow-xs'
+                                : 'text-[#615142] hover:bg-[#F2ECE2]'
+                            }`}
+                          >
+                            <span>{labels[filterKey]}</span>
+                            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                              chatInquiryFilter === filterKey ? 'bg-white/20 text-white' : 'bg-stone-100 text-stone-600'
+                            }`}>
+                              {count}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="relative w-full sm:w-56 shrink-0">
+                      <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-[#9E8E7E]" />
+                      <input
+                        type="text"
+                        value={chatSearchQuery}
+                        onChange={(e) => setChatSearchQuery(e.target.value)}
+                        placeholder={language === 'ko' ? '이름, 연락처, 내용 검색...' : 'Search inquiries...'}
+                        className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-lg font-sans"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Inquiry Cards List */}
+                  {(() => {
+                    const filtered = chatInquiries.filter(item => {
+                      const matchesStatus = chatInquiryFilter === 'all' || item.status === chatInquiryFilter;
+                      const q = chatSearchQuery.toLowerCase();
+                      const matchesSearch = !q ||
+                        item.name.toLowerCase().includes(q) ||
+                        item.contact.toLowerCase().includes(q) ||
+                        item.message.toLowerCase().includes(q) ||
+                        (item.category && item.category.toLowerCase().includes(q));
+                      return matchesStatus && matchesSearch;
+                    });
+
+                    if (filtered.length === 0) {
+                      return (
+                        <div className="bg-white rounded-2xl border border-[#E5DACD] p-10 text-center space-y-3">
+                          <MessageCircle className="w-10 h-10 mx-auto text-[#C8B8A6]" />
+                          <h4 className="text-sm font-bold text-[#1E1915]">
+                            {language === 'ko' ? '조회된 상담 문의가 없습니다.' : 'No consultation inquiries found.'}
+                          </h4>
+                          <p className="text-xs text-[#8C7A6B] max-w-sm mx-auto">
+                            {language === 'ko'
+                              ? '웹사이트 방문자가 24시간 상담 위젯을 통해 문의를 제출하면 실시간으로 이곳에 등록됩니다.'
+                              : 'When site visitors submit inquiries through the 24/7 widget, they will appear here.'}
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        {filtered.map((inq) => {
+                          const isExpanded = selectedInquiryForReply === inq.id;
+                          return (
+                            <div
+                              key={inq.id}
+                              className={`bg-white rounded-2xl border p-4 sm:p-5 shadow-xs transition-all space-y-3 ${
+                                inq.status === 'pending'
+                                  ? 'border-amber-300 ring-1 ring-amber-200'
+                                  : inq.status === 'in_progress'
+                                  ? 'border-blue-300'
+                                  : 'border-[#E5DACD]'
+                              }`}
+                            >
+                              {/* Top Bar: Name, Contact, Time, Status */}
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#F2ECE2] pb-2.5">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-bold text-sm text-[#1E1915]">
+                                    {inq.name}
+                                  </span>
+                                  <span className="text-xs text-[#7A6B5B] font-mono bg-[#FAF7F2] px-2 py-0.5 rounded border border-[#E8DFD3]">
+                                    {inq.contact}
+                                  </span>
+                                  {inq.category && (
+                                    <span className="text-[10px] font-bold bg-[#EA580C]/10 text-[#EA580C] px-2 py-0.5 rounded-full">
+                                      {inq.category}
+                                    </span>
+                                  )}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[11px] text-[#8C7A6B] flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {inq.createdAt}
+                                  </span>
+
+                                  {/* Status Selector Dropdown */}
+                                  <select
+                                    value={inq.status}
+                                    onChange={(e) => {
+                                      updateChatInquiryStatus(inq.id, e.target.value as any);
+                                      showNotification(language === 'ko' ? '상태가 변경되었습니다.' : 'Status updated.');
+                                    }}
+                                    className={`text-[11px] font-bold px-2 py-1 rounded-lg border cursor-pointer ${
+                                      inq.status === 'pending'
+                                        ? 'bg-amber-50 text-amber-800 border-amber-300'
+                                        : inq.status === 'in_progress'
+                                        ? 'bg-blue-50 text-blue-800 border-blue-300'
+                                        : 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                                    }`}
+                                  >
+                                    <option value="pending">{language === 'ko' ? '대기중' : 'Pending'}</option>
+                                    <option value="in_progress">{language === 'ko' ? '진행중' : 'In Progress'}</option>
+                                    <option value="resolved">{language === 'ko' ? '완료' : 'Resolved'}</option>
+                                  </select>
+
+                                  <button
+                                    onClick={() => handleDeleteInquiry(inq.id, inq.name)}
+                                    className="p-1 rounded text-rose-500 hover:bg-rose-50 cursor-pointer transition-colors"
+                                    title="삭제"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* Inquiry Message Body */}
+                              <div className="bg-[#FCFAF7] rounded-xl p-3 border border-[#EAE2D5] text-xs text-[#2E241B] leading-relaxed whitespace-pre-wrap font-sans">
+                                {inq.message}
+                              </div>
+
+                              {/* Admin Reply & Notes Display / Action */}
+                              {inq.adminReply && (
+                                <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3 text-xs space-y-1">
+                                  <div className="text-[11px] font-bold text-emerald-800 flex items-center gap-1">
+                                    <Check className="w-3 h-3" />
+                                    {language === 'ko' ? '상담원 공식 답변 내용:' : 'Counselor Reply:'}
+                                  </div>
+                                  <p className="text-emerald-950 whitespace-pre-wrap">{inq.adminReply}</p>
+                                </div>
+                              )}
+
+                              {inq.adminNotes && (
+                                <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-2.5 text-xs text-amber-900">
+                                  <span className="font-bold text-[11px] mr-1">📝 {language === 'ko' ? '내부 메모:' : 'Note:'}</span>
+                                  {inq.adminNotes}
+                                </div>
+                              )}
+
+                              {/* Toggle Reply Editor Button */}
+                              <div className="flex items-center justify-between pt-1">
+                                <button
+                                  onClick={() => {
+                                    if (isExpanded) {
+                                      setSelectedInquiryForReply(null);
+                                    } else {
+                                      setSelectedInquiryForReply(inq.id);
+                                      if (!replyDrafts[inq.id] && inq.adminReply) {
+                                        setReplyDrafts({ ...replyDrafts, [inq.id]: inq.adminReply });
+                                      }
+                                      if (!noteDrafts[inq.id] && inq.adminNotes) {
+                                        setNoteDrafts({ ...noteDrafts, [inq.id]: inq.adminNotes });
+                                      }
+                                    }
+                                  }}
+                                  className="text-xs font-semibold text-[#EA580C] hover:underline cursor-pointer flex items-center gap-1"
+                                >
+                                  <Edit className="w-3 h-3" />
+                                  <span>{isExpanded ? (language === 'ko' ? '답변 편집 닫기' : 'Close Reply') : (language === 'ko' ? '답변 작성 / 메모 수정' : 'Reply & Add Note')}</span>
+                                </button>
+                              </div>
+
+                              {/* Expanded Reply / Note Form */}
+                              {isExpanded && (
+                                <div className="pt-2 border-t border-[#F2ECE2] space-y-3 animate-in fade-in-50 duration-150">
+                                  <div>
+                                    <label className="block text-[11px] font-bold text-[#3B2F24] mb-1">
+                                      {language === 'ko' ? '상담원 공식 답변 (저장 시 상태가 자동으로 "완료"로 변경됩니다)' : 'Official Reply'}
+                                    </label>
+                                    <textarea
+                                      rows={2}
+                                      value={replyDrafts[inq.id] ?? (inq.adminReply || '')}
+                                      onChange={(e) => setReplyDrafts({ ...replyDrafts, [inq.id]: e.target.value })}
+                                      placeholder="방문자에게 안내할 상담 답변을 작성하세요."
+                                      className="w-full px-3 py-2 text-xs bg-white border border-[#DDD0C0] rounded-xl font-sans"
+                                    />
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-[11px] font-bold text-[#3B2F24] mb-1">
+                                      {language === 'ko' ? '관리자 내부 메모' : 'Internal Note'}
+                                    </label>
+                                    <input
+                                      type="text"
+                                      value={noteDrafts[inq.id] ?? (inq.adminNotes || '')}
+                                      onChange={(e) => setNoteDrafts({ ...noteDrafts, [inq.id]: e.target.value })}
+                                      placeholder="내부 공유용 메모 (예: 다음주 정기 모임 초대 안내 완료)"
+                                      className="w-full px-3 py-1.5 text-xs bg-white border border-[#DDD0C0] rounded-xl font-sans"
+                                    />
+                                  </div>
+
+                                  <div className="flex justify-end gap-2">
+                                    <button
+                                      type="button"
+                                      onClick={() => setSelectedInquiryForReply(null)}
+                                      className="px-3 py-1.5 rounded-lg border border-[#DDD0C0] text-[#6B5A4A] text-xs font-semibold cursor-pointer"
+                                    >
+                                      {language === 'ko' ? '취소' : 'Cancel'}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => handleSaveInquiryReplyAndNote(inq.id, inq.status)}
+                                      className="px-4 py-1.5 rounded-lg text-white text-xs font-semibold shadow-xs cursor-pointer flex items-center gap-1"
+                                      style={{ backgroundColor: theme.accentColor }}
+                                    >
+                                      <Check className="w-3.5 h-3.5" />
+                                      <span>{language === 'ko' ? '답변 저장 & 처리' : 'Save Reply'}</span>
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    );
+                  })()}
+                </div>
+
+                {/* Right 1 col: Chat Widget Config Panel */}
+                <div className="space-y-4">
+                  <div className="bg-white rounded-2xl border border-[#E5DACD] p-5 shadow-xs space-y-4">
+                    <div className="flex items-center gap-2 border-b border-[#F0E8DC] pb-3">
+                      <Headphones className="w-4 h-4 text-[#EA580C]" />
+                      <h4 className="text-sm font-bold text-[#1E1915]">
+                        {language === 'ko' ? '24시간 상담 위젯 환경 설정' : '24/7 Widget Settings'}
+                      </h4>
+                    </div>
+
+                    {/* Enable Toggle */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FCFAF7] border border-[#EAE2D5]">
+                        <div>
+                          <div className="text-xs font-bold text-[#1E1915]">
+                            {language === 'ko' ? '상담 위젯 활성화' : 'Live Chat Widget'}
+                          </div>
+                          <div className="text-[11px] text-[#7A6B5B]">
+                            {language === 'ko' ? '사이트 하단 플로팅 버튼 표시' : 'Show floating bottom widget'}
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={chatConfigForm.enabled}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, enabled: e.target.checked })}
+                          className="w-4 h-4 text-[#EA580C] rounded cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between p-2.5 rounded-xl bg-[#FCFAF7] border border-[#EAE2D5]">
+                        <div>
+                          <div className="text-xs font-bold text-[#1E1915]">
+                            {language === 'ko' ? '지능형 자동응답 안내' : 'Auto-Reply Assistant'}
+                          </div>
+                          <div className="text-[11px] text-[#7A6B5B]">
+                            {language === 'ko' ? '키워드 질의 즉시 답변 지원' : 'Instant AI FAQ response'}
+                          </div>
+                        </div>
+                        <input
+                          type="checkbox"
+                          checked={chatConfigForm.autoReplyEnabled}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, autoReplyEnabled: e.target.checked })}
+                          className="w-4 h-4 text-[#EA580C] rounded cursor-pointer"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Counselor Info */}
+                    <div className="space-y-3 pt-2 border-t border-[#F0E8DC]">
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '상담원 이름 (한국어)' : 'Counselor Name (KO)'}
+                        </label>
+                        <input
+                          type="text"
+                          value={chatConfigForm.counselorNameKo}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, counselorNameKo: e.target.value })}
+                          className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '상담원 소속 / 직함 (한국어)' : 'Counselor Title (KO)'}
+                        </label>
+                        <input
+                          type="text"
+                          value={chatConfigForm.counselorTitleKo}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, counselorTitleKo: e.target.value })}
+                          className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '환영 안내 메시지 (한국어)' : 'Welcome Message (KO)'}
+                        </label>
+                        <textarea
+                          rows={2}
+                          value={chatConfigForm.welcomeKo}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, welcomeKo: e.target.value })}
+                          className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '운영 시간 안내 문구' : 'Operating Hours Text'}
+                        </label>
+                        <input
+                          type="text"
+                          value={chatConfigForm.operatingHoursKo}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, operatingHoursKo: e.target.value })}
+                          className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                          <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                            {language === 'ko' ? '긴급 전화' : 'Emergency Phone'}
+                          </label>
+                          <input
+                            type="text"
+                            value={chatConfigForm.emergencyPhone}
+                            onChange={(e) => setChatConfigForm({ ...chatConfigForm, emergencyPhone: e.target.value })}
+                            className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                            {language === 'ko' ? '공식 이메일' : 'Email'}
+                          </label>
+                          <input
+                            type="text"
+                            value={chatConfigForm.emergencyEmail}
+                            onChange={(e) => setChatConfigForm({ ...chatConfigForm, emergencyEmail: e.target.value })}
+                            className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs font-bold text-[#3B2F24] mb-1">
+                          {language === 'ko' ? '상담 카테고리 태그 (쉼표로 구분)' : 'Categories (comma-separated)'}
+                        </label>
+                        <input
+                          type="text"
+                          value={chatConfigForm.categoriesStr}
+                          onChange={(e) => setChatConfigForm({ ...chatConfigForm, categoriesStr: e.target.value })}
+                          className="w-full px-3 py-1.5 text-xs bg-[#FCFAF7] border border-[#DDD0C0] rounded-xl font-sans"
+                        />
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveChatConfig}
+                      className="w-full py-2.5 rounded-xl text-white text-xs font-bold shadow-xs cursor-pointer flex items-center justify-center gap-1.5 transition-opacity hover:opacity-90"
+                      style={{ backgroundColor: theme.accentColor }}
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{language === 'ko' ? '상담 환경 설정 저장' : 'Save Chat Settings'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: THEME & DESIGN */}
           {activeTab === 'theme' && (
             <div className="space-y-6">
               <div>

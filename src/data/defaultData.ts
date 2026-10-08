@@ -5,7 +5,9 @@ import {
   Post,
   EventItem,
   BookItem,
-  PhilosophyPillar
+  PhilosophyPillar,
+  ChatConfig,
+  ChatInquiry
 } from '../types';
 
 export const defaultTheme: ThemeConfig = {
@@ -574,3 +576,71 @@ export const defaultFaqs = [
     }
   }
 ];
+
+export const defaultChatConfig: ChatConfig = {
+  enabled: true,
+  counselorName: {
+    ko: "라엘리안 전문 상담팀",
+    en: "Raëlian Live Counselor"
+  },
+  counselorTitle: {
+    ko: "24시간 실시간 온라인 상담센터",
+    en: "24/7 Dedicated Support Center"
+  },
+  welcomeMessage: {
+    ko: "안녕하세요! 부탄 라엘리안 무브먼트 24시간 실시간 상담센터입니다. 엘로힘의 메시지, 지적설계 철학, 대사관 프로젝트, 무료 전자책 신청, 감각명상 세미나 등 궁금하신 점을 무엇이든 편하게 물어보세요. 전문 상담원이 친절히 답변해 드립니다.",
+    en: "Welcome to the Bhutan Raëlian Movement 24/7 Live Consultation. Feel free to ask about the Elohim messages, intelligent design, the embassy project, free ebooks, or meditation workshops."
+  },
+  autoReplyEnabled: true,
+  operatingHours: {
+    ko: "365일 24시간 실시간 대기",
+    en: "24 Hours / 365 Days Always Online"
+  },
+  emergencyPhone: "+975 2 321 000 / 010-8888-2026",
+  emergencyEmail: "bhutan.contact@rael.org",
+  categories: [
+    "엘로힘 메시지 안내",
+    "무료 전자책 신청",
+    "감각명상 및 세미나",
+    "외계인 대사관 프로젝트",
+    "회원 가입 및 활동 안내",
+    "기타 1:1 상담 문의"
+  ]
+};
+
+export const defaultChatInquiries: ChatInquiry[] = [
+  {
+    id: "inq-1",
+    name: "김진호",
+    contact: "010-3342-9812 (jinho.kim@example.com)",
+    category: "외계인 대사관 프로젝트",
+    message: "부탄에 외계인 대사관을 건설하는 구체적인 추진 일정과 부지 선정 진행 현황이 어떻게 되는지 궁금합니다.",
+    createdAt: "2026-10-08 09:30",
+    status: "in_progress",
+    adminNotes: "부탄 정부 및 아시아 외교 대표단 협의 경과 요약 자료 이메일 발송 준비 중",
+    adminReply: "안녕하세요 김진호님, 엘로힘 대사관은 치외법권 지위를 바탕으로 부탄 내 여러 후보 부지를 신중히 검토 중이며 국제 포럼을 통해 진행 상황을 공유하고 있습니다."
+  },
+  {
+    id: "inq-2",
+    name: "Tashi Dorji",
+    contact: "tashi.d@bhutanmail.bt",
+    category: "감각명상 및 세미나",
+    message: "Is the upcoming Thimphu Peace Meditation workshop open to beginners? I would like to bring two colleagues.",
+    createdAt: "2026-10-07 16:45",
+    status: "resolved",
+    adminNotes: "영어 안내문 전달 완료",
+    adminReply: "Kuzuzangpo la! Yes, beginners are warmly welcome. Admission and materials are completely free of charge."
+  },
+  {
+    id: "inq-3",
+    name: "이지은",
+    contact: "jieun.lee@gmail.com",
+    category: "무료 전자책 신청",
+    message: "새로 추가된 '인간복제'와 '하늘에서 온 사람들(만화)' 책을 모바일과 태블릿에서 바로 볼 수 있는 PDF 링크를 확인하고 싶습니다.",
+    createdAt: "2026-10-08 11:15",
+    status: "resolved",
+    adminNotes: "도서 섹션 7권 안내 완료",
+    adminReply: "이지은님, 무료 도서 섹션에서 7종의 모든 전자책을 즉시 무료로 다운로드 받아 태블릿에서 감상하실 수 있습니다."
+  }
+];
+
