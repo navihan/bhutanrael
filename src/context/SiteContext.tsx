@@ -68,7 +68,7 @@ interface SiteContextType {
   importData: (jsonStr: string) => boolean;
 }
 
-const STORAGE_KEY = 'bhutan_rm_site_data_v1';
+const STORAGE_KEY = 'bhutan_rm_site_data_v2';
 const ADMIN_AUTH_KEY = 'bhutan_rm_admin_auth_v1';
 const ADMIN_PWD_KEY = 'bhutan_rm_admin_pwd_v1';
 const ADMIN_CURRENT_USER_KEY = 'bhutan_rm_current_admin_v1';

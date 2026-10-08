@@ -64,12 +64,13 @@ export const Footer: React.FC = () => {
               {language === 'ko' ? '사이트 메뉴' : 'Navigation'}
             </h4>
             <ul className="space-y-2 text-xs text-[#B0A294]">
-              <li><a href="#about" className="hover:text-white transition-colors">{language === 'ko' ? '라엘리안 소개' : 'About Movement'}</a></li>
-              <li><a href="#philosophy" className="hover:text-white transition-colors">{language === 'ko' ? '지적설계와 철학' : 'Intelligent Design'}</a></li>
-              <li><a href="#embassy" className="hover:text-white transition-colors">{language === 'ko' ? '외계인 대사관' : 'Elohim Embassy'}</a></li>
-              <li><a href="#articles" className="hover:text-white transition-colors">{language === 'ko' ? '소식 및 아카이브' : 'News & Archive'}</a></li>
-              <li><a href="#books" className="hover:text-white transition-colors">{language === 'ko' ? '전자책 무료 다운로드' : 'Free eBooks'}</a></li>
-              <li><a href="#events" className="hover:text-white transition-colors">{language === 'ko' ? '세미나 일정' : 'Event Schedule'}</a></li>
+              <li><a href="#about" className="hover:text-white transition-colors">{language === 'ko' ? '라엘' : 'About Movement'}</a></li>
+              <li><a href="#philosophy" className="hover:text-white transition-colors">{language === 'ko' ? '목표' : 'Goals & Philosophy'}</a></li>
+              <li><a href="#embassy" className="hover:text-white transition-colors">{language === 'ko' ? '엘로힘 대사관' : 'Elohim Embassy'}</a></li>
+              <li><a href="#articles" className="hover:text-white transition-colors">{language === 'ko' ? '최신메시지' : 'Latest Messages'}</a></li>
+              <li><a href="#books" className="hover:text-white transition-colors">{language === 'ko' ? '도서 다운로드' : 'Free eBooks'}</a></li>
+              <li><a href="#events" className="hover:text-white transition-colors">{language === 'ko' ? '행복아카데미' : 'Happiness Academy'}</a></li>
+              <li><a href="#contact" className="hover:text-white transition-colors">{language === 'ko' ? '문의' : 'Contact'}</a></li>
             </ul>
           </div>
 

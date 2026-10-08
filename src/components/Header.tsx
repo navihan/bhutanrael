@@ -17,12 +17,12 @@ export const Header: React.FC = () => {
 
   const navLinks = [
     { href: '#about', label: language === 'ko' ? '라엘' : 'About', icon: Compass },
-    { href: '#philosophy', label: language === 'ko' ? '지적설계 & 철학' : 'Philosophy', icon: Sparkles },
-    { href: '#embassy', label: language === 'ko' ? '외계인 대사관' : 'Embassy', icon: Building2 },
-    { href: '#articles', label: language === 'ko' ? '소식 & 아티클' : 'News & Insights', icon: Newspaper },
+    { href: '#philosophy', label: language === 'ko' ? '목표' : 'Philosophy', icon: Sparkles },
+    { href: '#embassy', label: language === 'ko' ? '엘로힘 대사관' : 'Embassy', icon: Building2 },
+    { href: '#articles', label: language === 'ko' ? '최신메시지' : 'News & Insights', icon: Newspaper },
     { href: '#books', label: language === 'ko' ? '도서 다운로드' : 'eBooks', icon: BookOpen },
-    { href: '#events', label: language === 'ko' ? '세미나 & 일정' : 'Events', icon: Calendar },
-    { href: '#contact', label: language === 'ko' ? '연락처' : 'Contact', icon: Mail },
+    { href: '#events', label: language === 'ko' ? '행복아카데미' : 'Events', icon: Calendar },
+    { href: '#contact', label: language === 'ko' ? '문의' : 'Contact', icon: Mail },
   ];
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
